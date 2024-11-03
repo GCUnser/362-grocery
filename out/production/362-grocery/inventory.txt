@@ -1,0 +1,2 @@
+Cereal,3.00,2
+Peanut Butter,2.69,1
