@@ -59,7 +59,7 @@ public class Item implements Serializable {
 
     @Override
     public String toString() {
-        return name + "," + String.format("%.2f", price) + "," + quantity + "," + Boolean.toString(taxable) + "," + Boolean.toString(foodStamp) + "," + String.join(",", date);
+        return name + "," + String.format("%.2f", price) + "," + quantity + "," + taxable + "," + foodStamp + "," + String.join(",", date);
     }
 
     public static Item fromString(String line) {
