@@ -1,2 +1,3 @@
-Cereal,3.00,2
+Cereal,3.00,0
 Peanut Butter,2.69,1
+Blueberry Muffin,6.99,7
