@@ -44,7 +44,7 @@ public class Main {
                     int requestedQuantity = scanner.nextInt();
                     scanner.nextLine(); // Consume newline
 
-                    double totalCost = store.checkout(itemName, requestedQuantity);
+                    double totalCost = store.checkout(itemName, requestedQuantity) * 1.07; //1.07 is tax
                     if (totalCost > 0) {
                         System.out.printf("Total cost for %s: $%.2f%n", itemName, totalCost);
                     }
