@@ -41,6 +41,18 @@ public class Item implements Serializable {
         }
     }
 
+    public void removeQuantity(int toRemove)
+    {
+        for(int i = 0; i < toRemove; i++)
+        {
+            if(quantity > 0)
+            {
+                date.removeFirst();
+                quantity = quantity - 1;
+            }
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -52,8 +64,10 @@ public class Item implements Serializable {
     public int getQuantity() {
         return quantity;
     }
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+
+    public ArrayList<String> getDate()
+    {
+        return date;
     }
 
 
