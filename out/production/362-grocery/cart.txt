@@ -1,2 +1,3 @@
-Apple, 1
-Blueberry Muffin, 2
+Blueberry Muffin, 1
+Banana, 1
+Chocolate Chip Cookie, 3

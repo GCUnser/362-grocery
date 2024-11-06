@@ -1,0 +1,14 @@
+Sold: Blueberry Muffin, Quantity: 1, Total Sale (without tax): $1.97
+Sold: Apple, Quantity: 1, Total Sale (without tax): $0.99
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Blueberry Muffin, Quantity: 1, Total Sale (without tax): $1.97
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Apple, Quantity: 1, Total Sale (without tax): $0.99
+Sold: Blueberry Muffin, Quantity: 1, Total Sale (without tax): $1.97
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19
+Sold: Banana, Quantity: 1, Total Sale (without tax): $0.19

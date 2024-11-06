@@ -5,13 +5,17 @@ public class Main {
     public static void main(String[] args) {
         GroceryStore store = new GroceryStore();
         Scanner scanner = new Scanner(System.in);
+        Cart cart = new Cart();
 
         while (true) {
             System.out.println("1. Add Item");
             System.out.println("2. View Inventory");
             System.out.println("3. Checkout");
             System.out.println("4. Return Item");
-            System.out.println("5. Exit");
+            System.out.println("5. Add Item To Cart");
+            System.out.println("6. View Cart");
+            System.out.println("7. View Receipt");
+            System.out.println("8. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -68,18 +72,36 @@ public class Main {
 //                    System.out.print("Enter quantity to buy: ");
 //                    int requestedQuantity = scanner.nextInt();
 //                    scanner.nextLine(); // Consume newline
-                    System.out.println("1. Card");
-                    System.out.println("2. Gift Card");
-                    System.out.println("3. Cash");
-                    System.out.println("4. Food Stamps");
-                    System.out.print("Choose an option (default cash): ");
-                    int payChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline left-over
+                    int payChoice = 0;
+                    boolean validChoice = false;
 
-                    double totalCost = store.checkout(payChoice);
-                    if (totalCost > 0) {
-                        System.out.printf("Total cost for cart: $%.2f%n", totalCost);
+                    while (!validChoice) {
+                        System.out.println("1. Card");
+                        System.out.println("2. Gift Card");
+                        System.out.println("3. Cash");
+                        System.out.println("4. Food Stamps");
+                        System.out.print("Choose an option: ");
+                        payChoice = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline left-over
+
+                        if (payChoice >= 1 && payChoice <= 4) {
+                            validChoice = true;
+                        } else {
+                            System.out.println("Invalid choice, please try again.");
+                        }
                     }
+                    System.out.print("Enter the amount you have: $");
+                    double userMoney = scanner.nextDouble();
+                    scanner.nextLine(); // Consume newline
+
+                    double totalCost = store.calculateCartCost();
+
+                    while (totalCost > userMoney) {
+                        System.out.println("You don't have enough money. Let's review your cart.");
+                        cart.reviewAndRemoveItems(store, cart, totalCost, userMoney, scanner);
+                        totalCost = store.calculateCartCost();
+                    }
+                    totalCost = store.checkout(payChoice, userMoney);
                     break;
                 case 4:
                     System.out.print("Enter the item name you want to return: ");
@@ -89,8 +111,30 @@ public class Main {
                     scanner.nextLine();
                     store.returnItem(name, quantity);
                     break;
-
                 case 5:
+                    System.out.print("Enter item name to add to cart: ");
+                    String itemName = scanner.nextLine();
+
+                    System.out.print("Enter quantity to add: ");
+                    int quantityToAdd = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+
+                    // Check if the item exists in the inventory before adding to the cart
+                    Item itemToAdd = store.getItemByName(itemName);
+                    if (itemToAdd != null && itemToAdd.getQuantity() >= quantityToAdd) {
+                        cart.addItemToCart(itemName, quantityToAdd);  // Add item to the cart
+                        System.out.println("Item added to cart successfully!\n");
+                    } else {
+                        System.out.println("Item not available or insufficient quantity in inventory.\n");
+                    }
+                    break;
+                case 6:
+                    Cart.displayCartItems();
+                    break;
+                case 7:
+                    Receipt.viewReceipt();
+                    break;
+                case 8:
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
@@ -99,5 +143,7 @@ public class Main {
                     System.out.println("Invalid choice, please try again.");
             }
         }
+
     }
+
 }
