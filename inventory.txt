@@ -1,4 +1,2 @@
-Cereal,3.00,0
-Peanut Butter,2.69,1
-Blueberry Muffin,6.99,7
-Apple,0.99,5
+Apple,0.99,2,false,true,11/28/2024,11/28/2024
+Blueberry Muffin,1.97,0,true,false,
