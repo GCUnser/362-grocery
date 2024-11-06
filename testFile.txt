@@ -1,0 +1,7 @@
+1, "absent for work more than 3 times without manager approval"
+3, "verbal harassment and/or violence"
+3, "verbal harassment and/or violence"
+5, "time fraud"
+5, "time fraud"
+5, "time fraud"
+7, "backflips"
