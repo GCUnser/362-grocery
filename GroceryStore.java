@@ -114,7 +114,7 @@ public class GroceryStore {
                                 receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, requestedQuantity, pricePerUnit, itemCost));
 
                                 // Update sales and profit
-                                updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false);
+                                updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
                                 System.out.println("Purchased " + requestedQuantity + " of " + itemName);
                             } else if (availableQuantity > 0) {
                                 item.setQuantity(0);
@@ -124,7 +124,7 @@ public class GroceryStore {
                                 receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, availableQuantity, pricePerUnit, itemCost));
 
                                 // Update sales and profit
-                                updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false);
+                                updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false, false);
                                 System.out.println("Only " + availableQuantity + " of " + itemName + " available. Purchased all available items.");
                             } else {
                                 System.out.println("Item " + itemName + " is out of stock.");
@@ -210,18 +210,31 @@ public class GroceryStore {
                 // Check if the item matches and if enough quantity was purchased to allow the return
                 if (receiptItemName.equalsIgnoreCase(itemName) && purchasedQuantity >= returnQuantity) {
                     itemFoundInReceipt = true;
-                    refundAmount = returnQuantity * unitPrice;
+                    boolean taxable;
+                    //refund amount differs based on if tax was paid
+                    if(purchasedQuantity * unitPrice == itemTotalCost) {
+                        refundAmount = returnQuantity * unitPrice;
+                        taxable = false;
+                    } else {
+                        refundAmount = returnQuantity * unitPrice * 1.07;
+                        taxable = true;
+                    }
 
                     // Adjust the receipt to show the remaining quantity after the return
                     int remainingQuantity = purchasedQuantity - returnQuantity;
-                    double remainingTotalCost = remainingQuantity * unitPrice;
+                    double remainingTotalCost;
+                    if(taxable) {
+                        remainingTotalCost = remainingQuantity * unitPrice * 1.07;
+                    } else {
+                        remainingTotalCost = remainingQuantity * unitPrice;
+                    }
                     if (remainingQuantity > 0) {
                         updatedReceiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n",
                                 receiptItemName, remainingQuantity, unitPrice, remainingTotalCost));
                     }
 
                     // Update returns and profit
-                    updateSalesAndProfit(itemName, returnQuantity, unitPrice, true);
+                    updateSalesAndProfit(itemName, returnQuantity, unitPrice, true, taxable);
                     System.out.println("Return processed successfully. Refund amount: $" + String.format("%.2f", refundAmount));
                 } else {
                     // Write the line as is if it does not match the return item or quantity was less than required
@@ -252,7 +265,7 @@ public class GroceryStore {
     }
 
     // Helper method to update sales, profit, and returns
-    private void updateSalesAndProfit(String itemName, int quantity, double pricePerUnit, boolean isReturn) {
+    private void updateSalesAndProfit(String itemName, int quantity, double pricePerUnit, boolean isReturn, boolean taxable) {
         double amount = quantity * pricePerUnit;
         if (isReturn) {
             // Write to returns.txt
@@ -260,6 +273,9 @@ public class GroceryStore {
                 writer.write(String.format("Returned: %s, Quantity: %d, Total Refund: $%.2f\n", itemName, quantity, amount));
             } catch (IOException e) {
                 System.err.println("Error writing to returns.txt: " + e.getMessage());
+            }
+            if(taxable) {
+                updateTaxFile(amount * 0.07);
             }
 
             // Subtract from profit
@@ -295,6 +311,27 @@ public class GroceryStore {
             }
         } catch (IOException e) {
             System.err.println("Error updating profit.txt: " + e.getMessage());
+        }
+    }
+
+    private void updateTaxFile(double amount) {
+        try {
+            // Read the current profit value
+            double currentProfit = 0.0;
+            try (BufferedReader reader = new BufferedReader(new FileReader("returnTaxOwed.txt"))) {
+                String line = reader.readLine();
+                if (line != null) {
+                    currentProfit = Double.parseDouble(line);
+                }
+            }
+
+            // Update the profit
+            currentProfit += amount;
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("returnTaxOwed.txt"))) {
+                writer.write(String.format("%.2f", currentProfit));
+            }
+        } catch (IOException e) {
+            System.err.println("Error updating returnTaxOwed.txt: " + e.getMessage());
         }
     }
 

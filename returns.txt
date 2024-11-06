@@ -1,2 +1,9 @@
 Returned: Apple, Quantity: 1, Total Refund: $0.99
 Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
+Returned: Chocolate Chip Cookie, Quantity: 2, Total Refund: $3.00
+Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
+Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
+Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
+Returned: Apple, Quantity: 1, Total Refund: $0.99
+Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
+Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
