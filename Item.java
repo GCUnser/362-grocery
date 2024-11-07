@@ -28,25 +28,53 @@ public class Item implements Serializable {
     }
 
     public void addQuantity(String date) {
-        this.date.add(date);
+        for(int j = 0; j <= this.date.size(); j++)
+        {
+            if(j == this.date.size())
+            {
+                this.date.add(date);
+                break;
+            }
+            else if(date.compareTo(this.date.get(j)) < 0)
+            {
+                this.date.add(j, date);
+                break;
+            }
+
+        }
         quantity += 1;
     }
 
     public void addQuantity(String date, int quantity) {
         this.quantity += quantity;
-        for (int i = 0; i < quantity; i++) {
-            this.date.add(date);
+        for(int j = 0; j <= this.date.size(); j++)
+        {
+            if(j == this.date.size())
+            {
+                for (int i = 0; i < quantity; i++) {
+                    this.date.add(date);
+                }
+                break;
+            }
+            else if(date.compareTo(this.date.get(j)) < 0)
+            {
+                for (int i = 0; i < quantity; i++) {
+                    this.date.add(j, date);
+                }
+                break;
+            }
         }
+
     }
 
-    public void removeQuantity(int toRemove)
+    public void removeDate(int toRemove)
     {
         for(int i = 0; i < toRemove; i++)
         {
             if(quantity > 0)
             {
                 date.removeFirst();
-                quantity = quantity - 1;
+                quantity--;
             }
         }
     }
@@ -74,11 +102,6 @@ public class Item implements Serializable {
     public ArrayList<String> getDateList() {
         return new ArrayList<>(date);
     }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
 
     @Override
     public String toString() {
