@@ -107,7 +107,6 @@ public class GroceryStore {
                         double itemCost = 0.0;
                         if(payment != 4 || item.isFoodStampEligible()) {
                             if (availableQuantity >= requestedQuantity) {
-                                item.setQuantity(availableQuantity - requestedQuantity);
                                 item.removeDate(requestedQuantity);
                                 itemCost = requestedQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
                                 totalCost += itemCost;
@@ -117,7 +116,6 @@ public class GroceryStore {
                                 updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
                                 System.out.println("Purchased " + requestedQuantity + " of " + itemName);
                             } else if (availableQuantity > 0) {
-                                item.setQuantity(0);
                                 item.removeDate(availableQuantity);
                                 itemCost = availableQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
                                 totalCost += itemCost;
@@ -254,6 +252,19 @@ public class GroceryStore {
         }
 
         return refundAmount;
+    }
+
+    public void removeSpoiled(String spoiled)
+    {
+        for(Item i: inventory) {
+            int j = 0;
+            for (String date : i.getDateList()) {
+                if (date.compareTo(spoiled) <= 0) {
+                    j++;
+                }
+            }
+            i.removeDate(j);
+        }
     }
 
     private void updateReceiptFile(String updatedReceiptContent) {
