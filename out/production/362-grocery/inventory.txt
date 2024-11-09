@@ -1,3 +1,1 @@
-Cereal,3.00,0
-Peanut Butter,2.69,1
-Blueberry Muffin,6.99,7
+apple,2.15,6,true,false,99-06-14,99-07-14,99-07-14,99-07-14,99-07-14,99-07-14
