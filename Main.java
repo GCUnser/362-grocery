@@ -71,7 +71,8 @@ public class Main {
                         break;
                     }
                     System.out.println("No item exists by that name, please enter it into the Inventory");
-                    System.out.print("Enter item name: ");
+                    scanner.nextLine();
+                    System.out.print("Enter item category: ");
                     category = scanner.nextLine();
                     System.out.print("Enter item price: ");
                     double price = scanner.nextDouble();
@@ -113,7 +114,7 @@ public class Main {
                     System.out.println("Inventory:");
                     for (Item i : store.getInventory()) {
                         System.out.printf("%s - %s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Only 21+ can buy: %b -  Expiration Dates: %s%n",
-                                i.getName(), i.getPrice(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
+                                i.getName(), i.getCategory(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
                     }
                     System.out.println();
                     break;

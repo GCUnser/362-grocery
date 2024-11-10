@@ -7,3 +7,4 @@ Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
 Returned: Apple, Quantity: 1, Total Refund: $0.99
 Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
 Returned: Blueberry Muffin, Quantity: 1, Total Refund: $1.97
+Returned: beer, Quantity: 1, Total Refund: $8.99
