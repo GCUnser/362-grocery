@@ -2,27 +2,33 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Item implements Serializable {
+    private boolean twentyOnePlus;
     private boolean foodStamp;
     private boolean taxable;
     private String name;
+    private String category;
     private double price;
     private int quantity;
     private ArrayList<String> date; //sorted from smallest date (next to expire) to largest date (furthest from expiration)
 
-    public Item(String name, double price, boolean taxable, boolean foodStamp) {
+    public Item(String name, String category, double price, boolean taxable, boolean foodStamp, boolean tOPlus) {
         this.name = name;
+        this.category = category;
         this.price = price;
         this.taxable = taxable;
         this.foodStamp = foodStamp;
+        twentyOnePlus = tOPlus;
         this.quantity = 0;
         this.date = new ArrayList<>(); // Initialize date list
     }
 
-    public Item(String name, double price, boolean taxable, boolean foodStamp, int quantity, ArrayList<String> date) {
+    public Item(String name, String category, double price, boolean taxable, boolean foodStamp, boolean tOPlus, int quantity, ArrayList<String> date) {
         this.name = name;
+        this.category = category;
         this.price = price;
         this.taxable = taxable;
         this.foodStamp = foodStamp;
+        twentyOnePlus = tOPlus;
         this.quantity = quantity;
         this.date = new ArrayList<>(date);
     }
@@ -69,10 +75,8 @@ public class Item implements Serializable {
 
     public void removeDate(int toRemove)
     {
-        for(int i = 0; i < toRemove; i++)
-        {
-            if(quantity > 0)
-            {
+        for(int i = 0; i < toRemove; i++) {
+            if (quantity > 0) {
                 date.removeFirst();
                 quantity--;
             }
@@ -81,6 +85,10 @@ public class Item implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public String getCategory(){
+        return category;
     }
 
     public double getPrice() {
@@ -99,39 +107,46 @@ public class Item implements Serializable {
         return foodStamp;
     }
 
+    public boolean forTwentyOnePlus() {
+        return twentyOnePlus;
+    }
+
     public ArrayList<String> getDateList() {
         return new ArrayList<>(date);
     }
 
     @Override
     public String toString() {
-        return name + "," + String.format("%.2f", price) + "," + quantity + "," + taxable + "," + foodStamp + "," + String.join(",", date);
+        return name + "," + category + "," + String.format("%.2f", price) + "," + quantity + "," + taxable + "," + foodStamp + "," + String.join(",", date);
     }
 
     public static Item fromString(String line) {
         String[] parts = line.split(",");
 
         // Ensure there are enough parts to create an Item, otherwise print an error and return null
-        if (parts.length < 5) {
+        if (parts.length < 6) {
             System.err.println("Error: Invalid line format. Skipping line: " + line);
             return null;
         }
 
         String name = parts[0];
+        String category = parts[1];
         double price;
         int quantity;
         boolean taxable;
         boolean foodStamp;
+        boolean twentyOnePlus;
         ArrayList<String> date = new ArrayList<>();
 
         try {
-            price = Double.parseDouble(parts[1]);
-            quantity = Integer.parseInt(parts[2]);
-            taxable = Boolean.parseBoolean(parts[3]);
-            foodStamp = Boolean.parseBoolean(parts[4]);
+            price = Double.parseDouble(parts[2]);
+            quantity = Integer.parseInt(parts[3]);
+            taxable = Boolean.parseBoolean(parts[4]);
+            foodStamp = Boolean.parseBoolean(parts[5]);
+            twentyOnePlus = Boolean.parseBoolean(parts[6]);
 
             // Collect any additional parts as dates, if available
-            for (int i = 5; i < parts.length; i++) {
+            for (int i = 7; i < parts.length; i++) {
                 date.add(parts[i]);
             }
 
@@ -140,7 +155,7 @@ public class Item implements Serializable {
             return null;
         }
 
-        return new Item(name, price, taxable, foodStamp, quantity, date);
+        return new Item(name, category, price, taxable, foodStamp, twentyOnePlus, quantity, date);
     }
 
 }

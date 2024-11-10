@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GroceryStore {
@@ -15,6 +16,69 @@ public class GroceryStore {
         inventory.add(item);
         saveInventory();
     }
+
+    public void sortInventory(int choice)
+    {
+
+        if(choice == 1)
+        {
+            //Alphabet
+        }
+        else if(choice == 2)
+        {
+            //Category
+            int sorted = 0;
+            String category = "";
+            while(sorted != inventory.size())
+            {
+                for(int i = 0; i < inventory.size() - sorted; i ++)
+                {
+                    if(category.isEmpty())
+                    {
+                        category = inventory.get(i).getCategory();
+                    }
+                    if(inventory.get(i).getCategory().equals(category))
+                    {
+                        Collections.swap(inventory, i, (inventory.size() - 1 - sorted));
+                        sorted++;
+                    }
+                }
+                category = "";
+            }
+
+        }
+    }
+
+    public int removeZeroItems()
+    {
+        int j = 0;
+        for(Item i: inventory)
+        {
+            if(i.getQuantity() == 0)
+            {
+                inventory.remove(i);
+                j++;
+            }
+        }
+        saveInventory();
+        return j;
+    }
+    public int removeItem(String name)
+    {
+        int j = 0;
+        for(Item i: inventory)
+        {
+            if(i.getName().compareTo(name) == 0)
+            {
+                inventory.remove(i);
+                j = 1;
+                break;
+            }
+        }
+        saveInventory();
+        return j;
+    }
+
     // Gets an item by name from the inventory
     public Item getItemByName(String name) {
         for (Item item : inventory) {
