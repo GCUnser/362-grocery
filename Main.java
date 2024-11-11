@@ -10,19 +10,22 @@ public class Main {
         Cart cart = new Cart();
         int quantity;
         String name;
+        String category;
 
         while (true) {
             System.out.println("1. Add Item");
             System.out.println("2. Remove Spoiled Items");
             System.out.println("3. View Inventory");
-            System.out.println("4. Checkout");
-            System.out.println("5. Return Item");
-            System.out.println("6. Add Item To Cart");
-            System.out.println("7. View Cart");
-            System.out.println("8. View Receipt");
-            System.out.println("9. Firing");
-            System.out.println("10. Hiring");
-            System.out.println("11. Exit");
+            System.out.println("4. Sort Inventory");
+            System.out.println("5. Remove Items From Inventory");
+            System.out.println("6. Checkout");
+            System.out.println("7. Return Item");
+            System.out.println("8. Add Item To Cart");
+            System.out.println("9. View Cart");
+            System.out.println("10. View Receipt");
+            System.out.println("11. Firing");
+            System.out.println("12. Hiring");
+            System.out.println("13. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -53,7 +56,7 @@ public class Main {
                                 System.out.print("Enter item quantity to add: ");
                                 quantity = scanner.nextInt();
                             }
-                            System.out.print("Enter expiration date of the item in form 'YY-mm-dd': ");
+                            System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
                             String date = scanner.next();
                             if (quantity == 1) {
                                 i.addQuantity(date);
@@ -68,6 +71,9 @@ public class Main {
                         break;
                     }
                     System.out.println("No item exists by that name, please enter it into the Inventory");
+                    scanner.nextLine();
+                    System.out.print("Enter item category: ");
+                    category = scanner.nextLine();
                     System.out.print("Enter item price: ");
                     double price = scanner.nextDouble();
                     System.out.print("Enter if item is Taxable (y or n): ");
@@ -84,15 +90,22 @@ public class Main {
                     } else {
                         foodStamp = false;
                     }
+                    System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
+                    boolean twentyOnePlus;
+                    if (scanner.next().equalsIgnoreCase("y")) {
+                        twentyOnePlus = true;
+                    } else {
+                        twentyOnePlus = false;
+                    }
                     scanner.nextLine(); // Consume newline
 
-                    Item item = new Item(name.toLowerCase(), price, taxable, foodStamp);
+                    Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp, twentyOnePlus);
                     store.addItem(item);
                     System.out.println("Item added successfully!\n");
                     break;
 
                 case 2:
-                    System.out.print("Please enter the date for which you would like to remove spoiled items for in the form 'YY-mm-dd': ");
+                    System.out.print("Please enter the date for which you would like to remove spoiled items for in the form 'YYYY-mm-dd': ");
                     String date = scanner.next();
                     store.removeSpoiled(date);
                     System.out.println("Removed spoiled items from inventory!\n");
@@ -100,13 +113,69 @@ public class Main {
                 case 3:
                     System.out.println("Inventory:");
                     for (Item i : store.getInventory()) {
-                        System.out.printf("%s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Expiration Dates: %s%n",
-                                i.getName(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.getDateList());
+                        System.out.printf("%s - %s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Only 21+ can buy: %b -  Expiration Dates: %s%n",
+                                i.getName(), i.getCategory(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
                     }
                     System.out.println();
                     break;
 
                 case 4:
+                    System.out.println("Please pick which method you would like to sort the inventory by");
+                    System.out.println("1. Alphabetical");
+                    System.out.println("2. Category");
+                    System.out.print("Chose which mode");
+                    int toSortBy;
+                    if(scanner.hasNextInt() && (toSortBy = scanner.nextInt()) == 1)
+                    {
+                        System.out.println("Sorting Alphabetically");
+                        store.sortInventory(toSortBy);
+                    }
+                    else if(scanner.hasNextInt() && (toSortBy = scanner.nextInt()) == 2)
+                    {
+                        System.out.println("Sorting By Category");
+                        store.sortInventory(toSortBy);
+                    }
+                    else
+                    {
+                        System.out.println("Invalid input, returning to main selection.");
+                    }
+                    System.out.println("Inventory Sorted.\n");
+                    break;
+
+                case 5:
+                    System.out.println("Would you like to remove all items with zero quantity, or remove a specific item?");
+                    System.out.println("1. Remove all items with zero quantity");
+                    System.out.println("2. Remove one specific item");
+                    System.out.print("Please select the option you would like to perform: ");
+                    String removeChoice = scanner.nextLine();
+                    int countRemoved;
+                    switch (removeChoice){
+                        case "1":
+                            countRemoved = store.removeZeroItems();
+                            System.out.println("Removed " + countRemoved + "items.\n");
+                            break;
+                        case "2":
+                            System.out.println("Please enter the name of the item you would like to remove: ");
+                            name = scanner.nextLine();
+                            countRemoved = store.removeItem(name);
+                            if(countRemoved == 0)
+                            {
+                                System.out.println("No item with name " + name + " found, returning.");
+                            }
+                            else if(countRemoved == 1)
+                            {
+                                System.out.println("Successfully removed item.\n");
+                            }
+                            break;
+                        default:
+                            System.out.println("No valid input, returning to main selection.\n");
+                    }
+
+
+
+                    break;
+
+                case 6:
 //                    System.out.print("Enter item name to buy: ");
 //                    String itemName = scanner.nextLine();
 //                    System.out.print("Enter quantity to buy: ");
@@ -114,6 +183,7 @@ public class Main {
 //                    scanner.nextLine(); // Consume newline
                     int payChoice = 0;
                     boolean validChoice = false;
+                    boolean twentyonePlus = false;
 
                     while (!validChoice) {
                         System.out.println("1. Card");
@@ -130,6 +200,11 @@ public class Main {
                             System.out.println("Invalid choice, please try again.");
                         }
                     }
+                    System.out.print("Are you 21 or older? (y/n): ");
+                    if(scanner.next().equalsIgnoreCase("y")) {
+                        twentyonePlus = true;
+                    }
+                    scanner.nextLine();
                     System.out.print("Enter the amount you have: $");
                     double userMoney = scanner.nextDouble();
                     scanner.nextLine(); // Consume newline
@@ -141,9 +216,9 @@ public class Main {
                         cart.reviewAndRemoveItems(store, cart, totalCost, userMoney, scanner);
                         totalCost = store.calculateCartCost();
                     }
-                    totalCost = store.checkout(payChoice, userMoney);
+                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus);
                     break;
-                case 5:
+                case 7:
                     System.out.print("Enter the item name you want to return: ");
                     name = scanner.nextLine();
                     System.out.print("Enter the quantity: ");
@@ -151,7 +226,7 @@ public class Main {
                     scanner.nextLine();
                     store.returnItem(name, quantity);
                     break;
-                case 6:
+                case 8:
                     System.out.print("Enter item name to add to cart: ");
                     String itemName = scanner.nextLine();
 
@@ -168,13 +243,13 @@ public class Main {
                         System.out.println("Item not available or insufficient quantity in inventory.\n");
                     }
                     break;
-                case 7:
+                case 9:
                     Cart.displayCartItems();
                     break;
-                case 8:
+                case 10:
                     Receipt.viewReceipt();
                     break;
-                case 9:
+                case 11:
                     // Counts how many times the same violation has occurred
                     int violationCount = 0;
 
@@ -239,7 +314,7 @@ public class Main {
                         e.printStackTrace();
                     }
                     break;
-                case 10:
+                case 12:
                     HashMap<Integer, String> requirements = new HashMap<>();
 
                     requirements.put(1, "full-time student status");
@@ -278,7 +353,9 @@ public class Main {
                         e.printStackTrace();
                     }
                     break;
-                case 11:
+                case 13:
+                    ArrayList<String> empty = new ArrayList<>();
+                    store.clearCart(empty); //clear the cart when exiting
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
