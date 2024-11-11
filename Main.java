@@ -71,7 +71,8 @@ public class Main {
                         break;
                     }
                     System.out.println("No item exists by that name, please enter it into the Inventory");
-                    System.out.print("Enter item name: ");
+                    scanner.nextLine();
+                    System.out.print("Enter item category: ");
                     category = scanner.nextLine();
                     System.out.print("Enter item price: ");
                     double price = scanner.nextDouble();
@@ -113,7 +114,7 @@ public class Main {
                     System.out.println("Inventory:");
                     for (Item i : store.getInventory()) {
                         System.out.printf("%s - %s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Only 21+ can buy: %b -  Expiration Dates: %s%n",
-                                i.getName(), i.getPrice(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
+                                i.getName(), i.getCategory(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
                     }
                     System.out.println();
                     break;
@@ -182,6 +183,7 @@ public class Main {
 //                    scanner.nextLine(); // Consume newline
                     int payChoice = 0;
                     boolean validChoice = false;
+                    boolean twentyonePlus = false;
 
                     while (!validChoice) {
                         System.out.println("1. Card");
@@ -198,6 +200,11 @@ public class Main {
                             System.out.println("Invalid choice, please try again.");
                         }
                     }
+                    System.out.print("Are you 21 or older? (y/n): ");
+                    if(scanner.next().equalsIgnoreCase("y")) {
+                        twentyonePlus = true;
+                    }
+                    scanner.nextLine();
                     System.out.print("Enter the amount you have: $");
                     double userMoney = scanner.nextDouble();
                     scanner.nextLine(); // Consume newline
@@ -209,7 +216,7 @@ public class Main {
                         cart.reviewAndRemoveItems(store, cart, totalCost, userMoney, scanner);
                         totalCost = store.calculateCartCost();
                     }
-                    totalCost = store.checkout(payChoice, userMoney);
+                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus);
                     break;
                 case 7:
                     System.out.print("Enter the item name you want to return: ");
@@ -347,6 +354,8 @@ public class Main {
                     }
                     break;
                 case 13:
+                    ArrayList<String> empty = new ArrayList<>();
+                    store.clearCart(empty); //clear the cart when exiting
                     System.out.println("Exiting...");
                     scanner.close();
                     return;

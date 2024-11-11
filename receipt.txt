@@ -1,6 +1,5 @@
 Receipt:
 Item	Quantity	Unit Price	Total Price
-apple	4	$2.15	$9.20
 
-Total Cost: $9.20
+Total Cost: $0.00
 Thank you for shopping with us!

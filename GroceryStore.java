@@ -134,7 +134,7 @@ public class GroceryStore {
     }
 
 
-    public double checkout(int payment, double userMoney) {
+    public double checkout(int payment, double userMoney, boolean twentyonePlus) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
@@ -170,32 +170,36 @@ public class GroceryStore {
                         double pricePerUnit = item.getPrice();
                         double itemCost = 0.0;
                         if(payment != 4 || item.isFoodStampEligible()) {
-                            if (availableQuantity >= requestedQuantity) {
-                                item.removeDate(requestedQuantity);
-                                itemCost = requestedQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
-                                totalCost += itemCost;
-                                receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, requestedQuantity, pricePerUnit, itemCost));
+                            if (twentyonePlus || !item.forTwentyOnePlus()) {
+                                if (availableQuantity >= requestedQuantity) {
+                                    item.removeDate(requestedQuantity);
+                                    itemCost = requestedQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
+                                    totalCost += itemCost;
+                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, requestedQuantity, pricePerUnit, itemCost));
 
-                                // Update sales and profit
-                                updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
-                                System.out.println("Purchased " + requestedQuantity + " of " + itemName);
-                            } else if (availableQuantity > 0) {
-                                item.removeDate(availableQuantity);
-                                itemCost = availableQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
-                                totalCost += itemCost;
-                                receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, availableQuantity, pricePerUnit, itemCost));
+                                    // Update sales and profit
+                                    updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
+                                    System.out.println("Purchased " + requestedQuantity + " of " + itemName);
+                                } else if (availableQuantity > 0) {
+                                    item.removeDate(availableQuantity);
+                                    itemCost = availableQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
+                                    totalCost += itemCost;
+                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, availableQuantity, pricePerUnit, itemCost));
 
-                                // Update sales and profit
-                                updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false, false);
-                                System.out.println("Only " + availableQuantity + " of " + itemName + " available. Purchased all available items.");
+                                    // Update sales and profit
+                                    updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false, false);
+                                    System.out.println("Only " + availableQuantity + " of " + itemName + " available. Purchased all available items.");
+                                } else {
+                                    System.out.println("Item " + itemName + " is out of stock.");
+                                }
+                                break;
                             } else {
-                                System.out.println("Item " + itemName + " is out of stock.");
+                                System.out.println("Item " + itemName + " requires the customer to be 21 years of age or older. We will return the item for you!");
                             }
-                            break;
-                        } else {
-                            System.out.println("Item " + itemName + " is not food stamp eligible. Pay with a different method.");
-                            itemsToRetainInCart.add(line);
-                        }
+                            } else {
+                                System.out.println("Item " + itemName + " is not food stamp eligible. Pay with a different method.");
+                                itemsToRetainInCart.add(line);
+                            }
                     }
                 }
 
@@ -221,7 +225,7 @@ public class GroceryStore {
         return totalCost;
     }
 
-    private void clearCart(ArrayList<String> itemsToRetain) {
+    public void clearCart(ArrayList<String> itemsToRetain) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("cart.txt"))) {
             for (String itemLine : itemsToRetain) {
                 writer.write(itemLine);
