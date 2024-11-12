@@ -1,7 +1,0 @@
-1, "absent for work more than 3 times without manager approval"
-2, "verbal harassment and/or violence"
-2, "verbal harassment and/or violence"
-3, "time fraud"
-3, "time fraud"
-3, "time fraud"
-4, "Racism"
