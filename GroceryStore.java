@@ -17,28 +17,20 @@ public class GroceryStore {
         saveInventory();
     }
 
-    public void sortInventory(int choice)
-    {
+    public void sortInventory(int choice) {
 
-        if(choice == 1)
-        {
-            //Alphabet
-        }
-        else if(choice == 2)
-        {
-            //Category
+        if (choice == 1) {
+            // Alphabet
+        } else if (choice == 2) {
+            // Category
             int sorted = 0;
             String category = "";
-            while(sorted != inventory.size())
-            {
-                for(int i = 0; i < inventory.size() - sorted; i ++)
-                {
-                    if(category.isEmpty())
-                    {
+            while (sorted != inventory.size()) {
+                for (int i = 0; i < inventory.size() - sorted; i++) {
+                    if (category.isEmpty()) {
                         category = inventory.get(i).getCategory();
                     }
-                    if(inventory.get(i).getCategory().equals(category))
-                    {
+                    if (inventory.get(i).getCategory().equals(category)) {
                         Collections.swap(inventory, i, (inventory.size() - 1 - sorted));
                         sorted++;
                     }
@@ -49,13 +41,10 @@ public class GroceryStore {
         }
     }
 
-    public int removeZeroItems()
-    {
+    public int removeZeroItems() {
         int j = 0;
-        for(Item i: inventory)
-        {
-            if(i.getQuantity() == 0)
-            {
+        for (Item i : inventory) {
+            if (i.getQuantity() == 0) {
                 inventory.remove(i);
                 j++;
             }
@@ -63,13 +52,11 @@ public class GroceryStore {
         saveInventory();
         return j;
     }
-    public int removeItem(String name)
-    {
+
+    public int removeItem(String name) {
         int j = 0;
-        for(Item i: inventory)
-        {
-            if(i.getName().compareTo(name) == 0)
-            {
+        for (Item i : inventory) {
+            if (i.getName().compareTo(name) == 0) {
                 inventory.remove(i);
                 j = 1;
                 break;
@@ -92,6 +79,7 @@ public class GroceryStore {
     public List<Item> getInventory() {
         return inventory;
     }
+
     public Item findItemInInventory(String itemName) {
         for (Item item : inventory) {
             if (item.getName().equalsIgnoreCase(itemName)) {
@@ -100,7 +88,6 @@ public class GroceryStore {
         }
         return null; // Return null if the item is not found
     }
-
 
     public double calculateCartCost() {
         double totalCost = 0.0;
@@ -133,12 +120,13 @@ public class GroceryStore {
         return totalCost;
     }
 
-
     public double checkout(int payment, double userMoney, boolean twentyonePlus) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
+        StringBuilder recordsContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
         receiptContent.append("Item\tQuantity\tUnit Price\tTotal Price\n");
+        recordsContent.append("Item\tQuantity\tUnit Price\tTotal Price\n");
         ArrayList<String> itemsToRetainInCart = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("cart.txt"))) {
@@ -169,13 +157,14 @@ public class GroceryStore {
                         int availableQuantity = item.getQuantity();
                         double pricePerUnit = item.getPrice();
                         double itemCost = 0.0;
-                        if(payment != 4 || item.isFoodStampEligible()) {
+                        if (payment != 4 || item.isFoodStampEligible()) {
                             if (twentyonePlus || !item.forTwentyOnePlus()) {
                                 if (availableQuantity >= requestedQuantity) {
                                     item.removeDate(requestedQuantity);
                                     itemCost = requestedQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
                                     totalCost += itemCost;
-                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, requestedQuantity, pricePerUnit, itemCost));
+                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName,
+                                            requestedQuantity, pricePerUnit, itemCost));
 
                                     // Update sales and profit
                                     updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
@@ -184,22 +173,26 @@ public class GroceryStore {
                                     item.removeDate(availableQuantity);
                                     itemCost = availableQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
                                     totalCost += itemCost;
-                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, availableQuantity, pricePerUnit, itemCost));
+                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName,
+                                            availableQuantity, pricePerUnit, itemCost));
 
                                     // Update sales and profit
                                     updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false, false);
-                                    System.out.println("Only " + availableQuantity + " of " + itemName + " available. Purchased all available items.");
+                                    System.out.println("Only " + availableQuantity + " of " + itemName
+                                            + " available. Purchased all available items.");
                                 } else {
                                     System.out.println("Item " + itemName + " is out of stock.");
                                 }
                                 break;
                             } else {
-                                System.out.println("Item " + itemName + " requires the customer to be 21 years of age or older. We will return the item for you!");
+                                System.out.println("Item " + itemName
+                                        + " requires the customer to be 21 years of age or older. We will return the item for you!");
                             }
-                            } else {
-                                System.out.println("Item " + itemName + " is not food stamp eligible. Pay with a different method.");
-                                itemsToRetainInCart.add(line);
-                            }
+                        } else {
+                            System.out.println(
+                                    "Item " + itemName + " is not food stamp eligible. Pay with a different method.");
+                            itemsToRetainInCart.add(line);
+                        }
                     }
                 }
 
@@ -207,8 +200,7 @@ public class GroceryStore {
                     System.out.println("Item " + itemName + " not found in inventory.");
                 }
             }
-            if(totalCost > userMoney)
-            {
+            if (totalCost > userMoney) {
                 return totalCost;
             }
 
@@ -217,6 +209,8 @@ public class GroceryStore {
             clearCart(itemsToRetainInCart);
             // Generate the receipt
             generateReceipt(receiptContent.toString(), totalCost);
+            // Add to sales record
+            generateSalesRecord(recordsContent.toString(), totalCost);
 
         } catch (IOException e) {
             System.err.println("Error reading cart.txt: " + e.getMessage());
@@ -246,8 +240,18 @@ public class GroceryStore {
         }
     }
 
+    private void generateSalesRecord(String recordsContent, double totalCost) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("salesRecords.txt"))) {
+            writer.write(recordsContent);
+            writer.write(String.format("\nTotal Cost: $%.2f\n", totalCost));
+        } catch (IOException e) {
+            System.err.println("Error writing to salesRecords.txt: " + e.getMessage());
+        }
+    }
+
     /*
-    return the item given and refund the customer, do not add the item back to inventory as it can't be resold
+     * return the item given and refund the customer, do not add the item back to
+     * inventory as it can't be resold
      */
     public double returnItem(String itemName, int returnQuantity) {
         double refundAmount = 0.0;
@@ -264,7 +268,7 @@ public class GroceryStore {
             while ((line = receiptReader.readLine()) != null) {
                 String[] parts = line.split("\t");
                 if (parts.length != 4) {
-                    //System.out.println("Invalid line format in receipt.txt: " + line);
+                    // System.out.println("Invalid line format in receipt.txt: " + line);
                     continue;
                 }
 
@@ -273,12 +277,13 @@ public class GroceryStore {
                 double unitPrice = Double.parseDouble(parts[2].replace("$", ""));
                 double itemTotalCost = Double.parseDouble(parts[3].replace("$", ""));
 
-                // Check if the item matches and if enough quantity was purchased to allow the return
+                // Check if the item matches and if enough quantity was purchased to allow the
+                // return
                 if (receiptItemName.equalsIgnoreCase(itemName) && purchasedQuantity >= returnQuantity) {
                     itemFoundInReceipt = true;
                     boolean taxable;
-                    //refund amount differs based on if tax was paid
-                    if(purchasedQuantity * unitPrice == itemTotalCost) {
+                    // refund amount differs based on if tax was paid
+                    if (purchasedQuantity * unitPrice == itemTotalCost) {
                         refundAmount = returnQuantity * unitPrice;
                         taxable = false;
                     } else {
@@ -289,7 +294,7 @@ public class GroceryStore {
                     // Adjust the receipt to show the remaining quantity after the return
                     int remainingQuantity = purchasedQuantity - returnQuantity;
                     double remainingTotalCost;
-                    if(taxable) {
+                    if (taxable) {
                         remainingTotalCost = remainingQuantity * unitPrice * 1.07;
                     } else {
                         remainingTotalCost = remainingQuantity * unitPrice;
@@ -301,15 +306,18 @@ public class GroceryStore {
 
                     // Update returns and profit
                     updateSalesAndProfit(itemName, returnQuantity, unitPrice, true, taxable);
-                    System.out.println("Return processed successfully. Refund amount: $" + String.format("%.2f", refundAmount));
+                    System.out.println(
+                            "Return processed successfully. Refund amount: $" + String.format("%.2f", refundAmount));
                 } else {
-                    // Write the line as is if it does not match the return item or quantity was less than required
+                    // Write the line as is if it does not match the return item or quantity was
+                    // less than required
                     updatedReceiptContent.append(line).append("\n");
                 }
             }
 
             if (!itemFoundInReceipt) {
-                System.out.println("Item " + itemName + " not found on the receipt or insufficient quantity to return.");
+                System.out
+                        .println("Item " + itemName + " not found on the receipt or insufficient quantity to return.");
             }
 
             // Update the receipt to reflect the return
@@ -322,9 +330,8 @@ public class GroceryStore {
         return refundAmount;
     }
 
-    public void removeSpoiled(String spoiled)
-    {
-        for(Item i: inventory) {
+    public void removeSpoiled(String spoiled) {
+        for (Item i : inventory) {
             int j = 0;
             for (String date : i.getDateList()) {
                 if (date.compareTo(spoiled) <= 0) {
@@ -344,16 +351,18 @@ public class GroceryStore {
     }
 
     // Helper method to update sales, profit, and returns
-    private void updateSalesAndProfit(String itemName, int quantity, double pricePerUnit, boolean isReturn, boolean taxable) {
+    private void updateSalesAndProfit(String itemName, int quantity, double pricePerUnit, boolean isReturn,
+            boolean taxable) {
         double amount = quantity * pricePerUnit;
         if (isReturn) {
             // Write to returns.txt
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("returns.txt", true))) {
-                writer.write(String.format("Returned: %s, Quantity: %d, Total Refund: $%.2f\n", itemName, quantity, amount));
+                writer.write(
+                        String.format("Returned: %s, Quantity: %d, Total Refund: $%.2f\n", itemName, quantity, amount));
             } catch (IOException e) {
                 System.err.println("Error writing to returns.txt: " + e.getMessage());
             }
-            if(taxable) {
+            if (taxable) {
                 updateTaxFile(amount * 0.07);
             }
 
@@ -362,7 +371,8 @@ public class GroceryStore {
         } else {
             // Write to sales.txt
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("sales.txt", true))) {
-                writer.write(String.format("Sold: %s, Quantity: %d, Total Sale (without tax): $%.2f\n", itemName, quantity, amount));
+                writer.write(String.format("Sold: %s, Quantity: %d, Total Sale (without tax): $%.2f\n", itemName,
+                        quantity, amount));
             } catch (IOException e) {
                 System.err.println("Error writing to sales.txt: " + e.getMessage());
             }
