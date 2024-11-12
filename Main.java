@@ -27,7 +27,9 @@ public class Main {
             System.out.println("10. View Receipt");
             System.out.println("11. Firing");
             System.out.println("12. Hiring");
-            System.out.println("13. Exit");
+            System.out.println("13. Sales Records");
+            System.out.println("14. Payroll");
+            System.out.println("15. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -407,7 +409,14 @@ public class Main {
                         e.printStackTrace();
                     }
                     break;
+
                 case 13:
+                    break;
+
+                case 14:
+                    break;
+
+                case 15:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");
