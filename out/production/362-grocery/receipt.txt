@@ -1,2 +1,5 @@
 Receipt:
 Item	Quantity	Unit Price	Total Price
+
+Total Cost: $0.00
+Thank you for shopping with us!
