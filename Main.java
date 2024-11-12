@@ -22,7 +22,9 @@ public class Main {
             System.out.println("8. View Receipt");
             System.out.println("9. Firing");
             System.out.println("10. Hiring");
-            System.out.println("11. Exit");
+            System.out.println("11. Payroll");
+            System.out.println("12. Sales Records");
+            System.out.println("13. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -49,7 +51,8 @@ public class Main {
                             System.out.print("Enter item quantity to add: ");
                             quantity = scanner.nextInt();
                             while (quantity <= 0) {
-                                System.out.println("Invalid quantity to add, please pick add a positive amount of inventory");
+                                System.out.println(
+                                        "Invalid quantity to add, please pick add a positive amount of inventory");
                                 System.out.print("Enter item quantity to add: ");
                                 quantity = scanner.nextInt();
                             }
@@ -92,7 +95,8 @@ public class Main {
                     break;
 
                 case 2:
-                    System.out.print("Please enter the date for which you would like to remove spoiled items for in the form 'YY-mm-dd': ");
+                    System.out.print(
+                            "Please enter the date for which you would like to remove spoiled items for in the form 'YY-mm-dd': ");
                     String date = scanner.next();
                     store.removeSpoiled(date);
                     System.out.println("Removed spoiled items from inventory!\n");
@@ -100,18 +104,20 @@ public class Main {
                 case 3:
                     System.out.println("Inventory:");
                     for (Item i : store.getInventory()) {
-                        System.out.printf("%s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Expiration Dates: %s%n",
-                                i.getName(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.getDateList());
+                        System.out.printf(
+                                "%s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Expiration Dates: %s%n",
+                                i.getName(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(),
+                                i.getDateList());
                     }
                     System.out.println();
                     break;
 
                 case 4:
-//                    System.out.print("Enter item name to buy: ");
-//                    String itemName = scanner.nextLine();
-//                    System.out.print("Enter quantity to buy: ");
-//                    int requestedQuantity = scanner.nextInt();
-//                    scanner.nextLine(); // Consume newline
+                    // System.out.print("Enter item name to buy: ");
+                    // String itemName = scanner.nextLine();
+                    // System.out.print("Enter quantity to buy: ");
+                    // int requestedQuantity = scanner.nextInt();
+                    // scanner.nextLine(); // Consume newline
                     int payChoice = 0;
                     boolean validChoice = false;
 
@@ -162,7 +168,7 @@ public class Main {
                     // Check if the item exists in the inventory before adding to the cart
                     Item itemToAdd = store.getItemByName(itemName);
                     if (itemToAdd != null && itemToAdd.getQuantity() >= quantityToAdd) {
-                        cart.addItemToCart(itemName, quantityToAdd);  // Add item to the cart
+                        cart.addItemToCart(itemName, quantityToAdd); // Add item to the cart
                         System.out.println("Item added to cart successfully!\n");
                     } else {
                         System.out.println("Item not available or insufficient quantity in inventory.\n");
@@ -178,13 +184,11 @@ public class Main {
                     // Counts how many times the same violation has occurred
                     int violationCount = 0;
 
-
                     Hiring h = new Hiring("TX69", "Molly", "Cashier", true, 13);
 
                     Firing f = new Firing("UC27", "Leo", true, false, false);
 
                     HashMap<Integer, String> policies = new HashMap<>();
-
 
                     ArrayList<String> names = new ArrayList<>();
 
@@ -192,16 +196,13 @@ public class Main {
                     names.add("Richard");
                     names.add("Lauren");
 
-
                     // Insert policies into a HashMap
                     policies.put(1, "absent for work more than 3 times without manager approval");
                     policies.put(2, "verbal harassment and/or violence");
                     policies.put(3, "time fraud");
                     policies.put(4, "Racism");
 
-
                     String filePath = "C:\\grocery\\362-grocery\\testFile.txt";
-
 
                     try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
                         String line;
@@ -211,10 +212,9 @@ public class Main {
                             if (!line.isEmpty()) {
                                 int firstChar = Character.getNumericValue(line.charAt(0));
 
-
                                 // Check if the line is in the HashMap as a key
                                 if (policies.containsKey(firstChar)) {
-                                    //System.out.println("Found in hashmap: " + line);
+                                    // System.out.println("Found in hashmap: " + line);
                                     violationCount++;
                                     if (violationCount == 1) {
                                         f.warning = true;
@@ -259,13 +259,12 @@ public class Main {
                         int i = 0;
                         while ((line = br.readLine()) != null) {
 
-
                             if (!line.isEmpty()) {
                                 int firstChar = Character.getNumericValue(line.charAt(0));
 
                                 // Check if the line is in the HashMap as a key
                                 if (requirements.containsKey(firstChar)) {
-                                    //System.out.println("Found in hashmap: " + line);
+                                    // System.out.println("Found in hashmap: " + line);
                                     System.out.println(empNames.get(i));
                                 }
                             } else {
@@ -278,7 +277,16 @@ public class Main {
                         e.printStackTrace();
                     }
                     break;
+
                 case 11:
+
+                    break;
+
+                case 12:
+
+                    break;
+
+                case 13:
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
@@ -288,4 +296,3 @@ public class Main {
         }
     }
 }
-
