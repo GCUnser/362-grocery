@@ -26,3 +26,4 @@ Sold: apple, Quantity: 3, Total Sale (without tax): $6.45
 Sold: apple, Quantity: 4, Total Sale (without tax): $8.60
 Sold: beer, Quantity: 2, Total Sale (without tax): $17.98
 Sold: beer, Quantity: 1, Total Sale (without tax): $8.99
+Sold: beer, Quantity: 1, Total Sale (without tax): $8.99
