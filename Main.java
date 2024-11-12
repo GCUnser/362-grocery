@@ -27,8 +27,8 @@ public class Main {
             System.out.println("10. View Receipt");
             System.out.println("11. Firing");
             System.out.println("12. Hiring");
-            System.out.println("13. Sales Records");
-            System.out.println("14. Payroll");
+            System.out.println("13. View Sales Records");
+            System.out.println("14. Process Payroll");
             System.out.println("15. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
@@ -411,6 +411,7 @@ public class Main {
                     break;
 
                 case 13:
+                    SalesRecord.viewSalesRecords();
                     break;
 
                 case 14:
