@@ -1,0 +1,4 @@
+"Emma", "full-time student status", "no criminal charges", "18 or older"
+"Jake", "no criminal charges"
+"Abby", "full-time student status"
+
