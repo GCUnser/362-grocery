@@ -1,0 +1,2 @@
+1, "full-time student status"
+2, "no criminal charges"

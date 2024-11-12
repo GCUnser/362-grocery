@@ -117,11 +117,11 @@ public class Cart {
 
                     // Check if item names match (case insensitive)
                     if (itemName.equalsIgnoreCase(cartItemName)) {
-                        // If item found, parse the price (second element in the line)
-                        if(parts[3].equals("true")) {
-                            price = Double.parseDouble(parts[1]) * 1.07;
+                        // If item found, parse the price (third element in the line)
+                        if(parts[4].equals("true")) {
+                            price = Double.parseDouble(parts[2]) * 1.07;
                         } else {
-                            price = Double.parseDouble(parts[1]);
+                            price = Double.parseDouble(parts[2]);
                         }
                         break;  // Exit loop once the item is found
                     }

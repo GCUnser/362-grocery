@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GroceryStore {
@@ -15,6 +16,69 @@ public class GroceryStore {
         inventory.add(item);
         saveInventory();
     }
+
+    public void sortInventory(int choice)
+    {
+
+        if(choice == 1)
+        {
+            //Alphabet
+        }
+        else if(choice == 2)
+        {
+            //Category
+            int sorted = 0;
+            String category = "";
+            while(sorted != inventory.size())
+            {
+                for(int i = 0; i < inventory.size() - sorted; i ++)
+                {
+                    if(category.isEmpty())
+                    {
+                        category = inventory.get(i).getCategory();
+                    }
+                    if(inventory.get(i).getCategory().equals(category))
+                    {
+                        Collections.swap(inventory, i, (inventory.size() - 1 - sorted));
+                        sorted++;
+                    }
+                }
+                category = "";
+            }
+
+        }
+    }
+
+    public int removeZeroItems()
+    {
+        int j = 0;
+        for(Item i: inventory)
+        {
+            if(i.getQuantity() == 0)
+            {
+                inventory.remove(i);
+                j++;
+            }
+        }
+        saveInventory();
+        return j;
+    }
+    public int removeItem(String name)
+    {
+        int j = 0;
+        for(Item i: inventory)
+        {
+            if(i.getName().compareTo(name) == 0)
+            {
+                inventory.remove(i);
+                j = 1;
+                break;
+            }
+        }
+        saveInventory();
+        return j;
+    }
+
     // Gets an item by name from the inventory
     public Item getItemByName(String name) {
         for (Item item : inventory) {
@@ -70,7 +134,7 @@ public class GroceryStore {
     }
 
 
-    public double checkout(int payment, double userMoney) {
+    public double checkout(int payment, double userMoney, boolean twentyonePlus) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
@@ -106,32 +170,36 @@ public class GroceryStore {
                         double pricePerUnit = item.getPrice();
                         double itemCost = 0.0;
                         if(payment != 4 || item.isFoodStampEligible()) {
-                            if (availableQuantity >= requestedQuantity) {
-                                item.removeDate(requestedQuantity);
-                                itemCost = requestedQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
-                                totalCost += itemCost;
-                                receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, requestedQuantity, pricePerUnit, itemCost));
+                            if (twentyonePlus || !item.forTwentyOnePlus()) {
+                                if (availableQuantity >= requestedQuantity) {
+                                    item.removeDate(requestedQuantity);
+                                    itemCost = requestedQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
+                                    totalCost += itemCost;
+                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, requestedQuantity, pricePerUnit, itemCost));
 
-                                // Update sales and profit
-                                updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
-                                System.out.println("Purchased " + requestedQuantity + " of " + itemName);
-                            } else if (availableQuantity > 0) {
-                                item.removeDate(availableQuantity);
-                                itemCost = availableQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
-                                totalCost += itemCost;
-                                receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, availableQuantity, pricePerUnit, itemCost));
+                                    // Update sales and profit
+                                    updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
+                                    System.out.println("Purchased " + requestedQuantity + " of " + itemName);
+                                } else if (availableQuantity > 0) {
+                                    item.removeDate(availableQuantity);
+                                    itemCost = availableQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
+                                    totalCost += itemCost;
+                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName, availableQuantity, pricePerUnit, itemCost));
 
-                                // Update sales and profit
-                                updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false, false);
-                                System.out.println("Only " + availableQuantity + " of " + itemName + " available. Purchased all available items.");
+                                    // Update sales and profit
+                                    updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false, false);
+                                    System.out.println("Only " + availableQuantity + " of " + itemName + " available. Purchased all available items.");
+                                } else {
+                                    System.out.println("Item " + itemName + " is out of stock.");
+                                }
+                                break;
                             } else {
-                                System.out.println("Item " + itemName + " is out of stock.");
+                                System.out.println("Item " + itemName + " requires the customer to be 21 years of age or older. We will return the item for you!");
                             }
-                            break;
-                        } else {
-                            System.out.println("Item " + itemName + " is not food stamp eligible. Pay with a different method.");
-                            itemsToRetainInCart.add(line);
-                        }
+                            } else {
+                                System.out.println("Item " + itemName + " is not food stamp eligible. Pay with a different method.");
+                                itemsToRetainInCart.add(line);
+                            }
                     }
                 }
 
@@ -157,7 +225,7 @@ public class GroceryStore {
         return totalCost;
     }
 
-    private void clearCart(ArrayList<String> itemsToRetain) {
+    public void clearCart(ArrayList<String> itemsToRetain) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("cart.txt"))) {
             for (String itemLine : itemsToRetain) {
                 writer.write(itemLine);
