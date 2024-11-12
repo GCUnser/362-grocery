@@ -414,6 +414,32 @@ public class Main {
                     break;
 
                 case 14:
+
+                    // Read the input file (employeePayroll.txt) and process each employee
+                    try (BufferedReader br = new BufferedReader(new FileReader("employeePayroll.txt"));
+                            FileWriter writer = new FileWriter("output3.txt")) {
+
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                // Split the line into the candidate's name, their wage, and their hours
+                                String[] parts = line.split(", ");
+                                String employeeName = parts[0].replace("\"", ""); // Remove quotes around the name
+                                double employeeWage = Double.parseDouble(parts[1]);
+                                int employeeHours = Integer.parseInt(parts[2]);
+
+                                String output;
+                                output = employeeName + ": $" + Payroll.calculateWage(employeeWage, employeeHours)
+                                        + " deposited";
+
+                                // Write the result to the output file
+                                writer.write(output + System.lineSeparator());
+                            }
+                        }
+                        System.out.println("Payment completed. Results written to output3.txt.");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
 
                 case 15:
