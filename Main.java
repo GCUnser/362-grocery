@@ -1,7 +1,9 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -25,7 +27,9 @@ public class Main {
             System.out.println("10. View Receipt");
             System.out.println("11. Firing");
             System.out.println("12. Hiring");
-            System.out.println("13. Exit");
+            System.out.println("13. View Sales Records");
+            System.out.println("14. Process Payroll");
+            System.out.println("15. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -52,7 +56,8 @@ public class Main {
                             System.out.print("Enter item quantity to add: ");
                             quantity = scanner.nextInt();
                             while (quantity <= 0) {
-                                System.out.println("Invalid quantity to add, please pick add a positive amount of inventory");
+                                System.out.println(
+                                        "Invalid quantity to add, please pick add a positive amount of inventory");
                                 System.out.print("Enter item quantity to add: ");
                                 quantity = scanner.nextInt();
                             }
@@ -99,13 +104,15 @@ public class Main {
                     }
                     scanner.nextLine(); // Consume newline
 
-                    Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp, twentyOnePlus);
+                    Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
+                            twentyOnePlus);
                     store.addItem(item);
                     System.out.println("Item added successfully!\n");
                     break;
 
                 case 2:
-                    System.out.print("Please enter the date for which you would like to remove spoiled items for in the form 'YYYY-mm-dd': ");
+                    System.out.print(
+                            "Please enter the date for which you would like to remove spoiled items for in the form 'YYYY-mm-dd': ");
                     String date = scanner.next();
                     store.removeSpoiled(date);
                     System.out.println("Removed spoiled items from inventory!\n");
@@ -113,8 +120,10 @@ public class Main {
                 case 3:
                     System.out.println("Inventory:");
                     for (Item i : store.getInventory()) {
-                        System.out.printf("%s - %s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Only 21+ can buy: %b -  Expiration Dates: %s%n",
-                                i.getName(), i.getCategory(), i.getPrice(), i.getQuantity(), i.isTaxable(), i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
+                        System.out.printf(
+                                "%s - %s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Only 21+ can buy: %b -  Expiration Dates: %s%n",
+                                i.getName(), i.getCategory(), i.getPrice(), i.getQuantity(), i.isTaxable(),
+                                i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
                     }
                     System.out.println();
                     break;
@@ -125,31 +134,27 @@ public class Main {
                     System.out.println("2. Category");
                     System.out.print("Chose which mode");
                     int toSortBy;
-                    if(scanner.hasNextInt() && (toSortBy = scanner.nextInt()) == 1)
-                    {
+                    if (scanner.hasNextInt() && (toSortBy = scanner.nextInt()) == 1) {
                         System.out.println("Sorting Alphabetically");
                         store.sortInventory(toSortBy);
-                    }
-                    else if(scanner.hasNextInt() && (toSortBy = scanner.nextInt()) == 2)
-                    {
+                    } else if (scanner.hasNextInt() && (toSortBy = scanner.nextInt()) == 2) {
                         System.out.println("Sorting By Category");
                         store.sortInventory(toSortBy);
-                    }
-                    else
-                    {
+                    } else {
                         System.out.println("Invalid input, returning to main selection.");
                     }
                     System.out.println("Inventory Sorted.\n");
                     break;
 
                 case 5:
-                    System.out.println("Would you like to remove all items with zero quantity, or remove a specific item?");
+                    System.out.println(
+                            "Would you like to remove all items with zero quantity, or remove a specific item?");
                     System.out.println("1. Remove all items with zero quantity");
                     System.out.println("2. Remove one specific item");
                     System.out.print("Please select the option you would like to perform: ");
                     String removeChoice = scanner.nextLine();
                     int countRemoved;
-                    switch (removeChoice){
+                    switch (removeChoice) {
                         case "1":
                             countRemoved = store.removeZeroItems();
                             System.out.println("Removed " + countRemoved + "items.\n");
@@ -158,12 +163,9 @@ public class Main {
                             System.out.println("Please enter the name of the item you would like to remove: ");
                             name = scanner.nextLine();
                             countRemoved = store.removeItem(name);
-                            if(countRemoved == 0)
-                            {
+                            if (countRemoved == 0) {
                                 System.out.println("No item with name " + name + " found, returning.");
-                            }
-                            else if(countRemoved == 1)
-                            {
+                            } else if (countRemoved == 1) {
                                 System.out.println("Successfully removed item.\n");
                             }
                             break;
@@ -171,16 +173,14 @@ public class Main {
                             System.out.println("No valid input, returning to main selection.\n");
                     }
 
-
-
                     break;
 
                 case 6:
-//                    System.out.print("Enter item name to buy: ");
-//                    String itemName = scanner.nextLine();
-//                    System.out.print("Enter quantity to buy: ");
-//                    int requestedQuantity = scanner.nextInt();
-//                    scanner.nextLine(); // Consume newline
+                    // System.out.print("Enter item name to buy: ");
+                    // String itemName = scanner.nextLine();
+                    // System.out.print("Enter quantity to buy: ");
+                    // int requestedQuantity = scanner.nextInt();
+                    // scanner.nextLine(); // Consume newline
                     int payChoice = 0;
                     boolean validChoice = false;
                     boolean twentyonePlus = false;
@@ -201,7 +201,7 @@ public class Main {
                         }
                     }
                     System.out.print("Are you 21 or older? (y/n): ");
-                    if(scanner.next().equalsIgnoreCase("y")) {
+                    if (scanner.next().equalsIgnoreCase("y")) {
                         twentyonePlus = true;
                     }
                     scanner.nextLine();
@@ -237,7 +237,7 @@ public class Main {
                     // Check if the item exists in the inventory before adding to the cart
                     Item itemToAdd = store.getItemByName(itemName);
                     if (itemToAdd != null && itemToAdd.getQuantity() >= quantityToAdd) {
-                        cart.addItemToCart(itemName, quantityToAdd);  // Add item to the cart
+                        cart.addItemToCart(itemName, quantityToAdd); // Add item to the cart
                         System.out.println("Item added to cart successfully!\n");
                     } else {
                         System.out.println("Item not available or insufficient quantity in inventory.\n");
@@ -250,112 +250,202 @@ public class Main {
                     Receipt.viewReceipt();
                     break;
                 case 11:
-                    // Counts how many times the same violation has occurred
-                    int violationCount = 0;
+                    // Create the HashMap for policies with keys and associated information
+                    HashMap<Integer, List<String>> policies = new HashMap<>();
 
+                    // Add multiple values for each key
+                    List<String> policy1 = new ArrayList<>();
+                    policy1.add("absent for work more than 3 times without manager approval");
+                    policy1.add("Lauren");
 
-                    Hiring h = new Hiring("TX69", "Molly", "Cashier", true, 13);
+                    List<String> policy2 = new ArrayList<>();
+                    policy2.add("verbal harassment");
+                    policy2.add("Jake");
 
-                    Firing f = new Firing("UC27", "Leo", true, false, false);
+                    List<String> policy3 = new ArrayList<>();
+                    policy3.add("time fraud");
+                    policy3.add("Molly");
 
-                    HashMap<Integer, String> policies = new HashMap<>();
+                    List<String> policy4 = new ArrayList<>();
+                    policy4.add("Racism");
+                    policy4.add("Chase");
 
+                    // Put the lists into the HashMap
+                    policies.put(1, policy1);
+                    policies.put(2, policy2);
+                    policies.put(3, policy3);
+                    policies.put(4, policy4);
 
-                    ArrayList<String> names = new ArrayList<>();
+                    // Create a BufferedReader to read user input
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-                    names.add("Lexi");
-                    names.add("Richard");
-                    names.add("Lauren");
+                    try {
+                        // Ask the user to pick a key (1, 2, 3, or 4)
+                        System.out.println(
+                                "Enter a key (1, 2, 3, or 4) to view the corresponding violation information:");
+                        String userInput = reader.readLine();
 
+                        // Convert the input to an integer key
+                        int key = Integer.parseInt(userInput.trim());
 
-                    // Insert policies into a HashMap
-                    policies.put(1, "absent for work more than 3 times without manager approval");
-                    policies.put(2, "verbal harassment and/or violence");
-                    policies.put(3, "time fraud");
-                    policies.put(4, "Racism");
+                        // Check if the entered key exists in the HashMap
+                        if (policies.containsKey(key)) {
+                            // Read the dataFile.txt to count occurrences of the key
+                            String fileName = "dataFile.txt";
+                            int violationCount = 0;
 
-
-                    String filePath = "C:\\grocery\\362-grocery\\testFile.txt";
-
-
-                    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-                        String line;
-                        int i = 0;
-                        while ((line = br.readLine()) != null) {
-
-                            if (!line.isEmpty()) {
-                                int firstChar = Character.getNumericValue(line.charAt(0));
-
-
-                                // Check if the line is in the HashMap as a key
-                                if (policies.containsKey(firstChar)) {
-                                    //System.out.println("Found in hashmap: " + line);
-                                    violationCount++;
-                                    if (violationCount == 1) {
-                                        f.warning = true;
-                                        System.out.println("WARNING: " + names.get(i));
+                            // Read the file and count occurrences of the selected key
+                            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    // Trim and check if the line starts with the key followed by a comma (e.g.,
+                                    // "1,")
+                                    line = line.trim();
+                                    if (!line.isEmpty()) {
+                                        String[] parts = line.split(",");
+                                        if (parts.length > 0) {
+                                            try {
+                                                int currentKey = Integer.parseInt(parts[0].trim());
+                                                if (currentKey == key) {
+                                                    violationCount++; // Increment if the key is found
+                                                }
+                                            } catch (NumberFormatException e) {
+                                                // Handle the case where the key part is not an integer
+                                                System.out.println("Error parsing key from line: " + line);
+                                            }
+                                        }
                                     }
-                                    if (violationCount == 2) {
-                                        f.meetingWithManager = true;
-                                        System.out.println("Schedule a meeting with the manager: " + names.get(i));
-                                    }
-                                    if (violationCount == 3) {
-                                        f.isFired = true;
-                                        System.out.println("Fired: " + names.get(i));
-                                    }
-                                } else {
-                                    System.out.println("Not found in hashmap: " + line);
                                 }
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
 
-                            i++;
+                            // Get the policy details for the given key
+                            List<String> policyDetails = policies.get(key);
+                            String policyDescription = policyDetails.get(0);
+                            String employeeName = policyDetails.get(1);
+
+                            // Define the action based on the violation count
+                            String violationAction;
+                            if (violationCount == 1) {
+                                violationAction = "Warning for " + employeeName;
+                            } else if (violationCount == 2) {
+                                violationAction = "Meeting scheduled with manager for " + employeeName;
+                            } else if (violationCount >= 3) {
+                                violationAction = "Fired " + employeeName;
+                            } else {
+                                violationAction = "No violations found for " + employeeName;
+                            }
+
+                            // Write the violation information to output1.txt
+                            String outputFileName = "output1.txt";
+                            StringBuilder contentToWrite = new StringBuilder();
+                            contentToWrite.append("Violation: ").append(policyDescription)
+                                    .append(System.lineSeparator());
+                            contentToWrite.append("Action: ").append(violationAction).append(System.lineSeparator());
+
+                            // Write the violation information to the new output file
+                            try (FileWriter writer = new FileWriter(outputFileName)) {
+                                writer.write(contentToWrite.toString());
+                                System.out.println("Output written to output1.txt.");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            System.out.println("Invalid key! Please enter a valid key (1, 2, 3, or 4).");
                         }
+
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input! Please enter a number (1, 2, 3, or 4).");
                     }
+
                     break;
+
                 case 12:
                     HashMap<Integer, String> requirements = new HashMap<>();
-
                     requirements.put(1, "full-time student status");
                     requirements.put(2, "no criminal charges");
+                    requirements.put(3, "18 or older");
 
-                    ArrayList<String> empNames = new ArrayList<>();
+                    // Read the input file (jobRequirements.txt) and process each candidate
+                    try (BufferedReader br = new BufferedReader(new FileReader("jobRequirements.txt"));
+                            FileWriter writer = new FileWriter("output2.txt")) {
 
-                    // Add names to the ArrayList
-                    empNames.add("Leo");
-
-                    empNames.add("Emma");
-
-                    String filePath2 = "C:\\grocery\\362-grocery\\testFile2.txt";
-
-                    try (BufferedReader br = new BufferedReader(new FileReader(filePath2))) {
                         String line;
-                        int i = 0;
                         while ((line = br.readLine()) != null) {
-
-
                             if (!line.isEmpty()) {
-                                int firstChar = Character.getNumericValue(line.charAt(0));
+                                // Split the line into the candidate's name and their qualifications
+                                String[] parts = line.split(", ");
+                                String candidateName = parts[0].replace("\"", ""); // Remove quotes around the name
 
-                                // Check if the line is in the HashMap as a key
-                                if (requirements.containsKey(firstChar)) {
-                                    //System.out.println("Found in hashmap: " + line);
-                                    System.out.println(empNames.get(i));
+                                // Check if the candidate's qualifications match all requirements
+                                int requirementsMatched = 0;
+                                for (int key : requirements.keySet()) {
+                                    for (int i = 1; i < parts.length; i++) {
+                                        if (requirements.get(key).equals(parts[i].replace("\"", ""))) {
+                                            requirementsMatched++;
+                                            break; // Stop checking other parts once a match is found
+                                        }
+                                    }
                                 }
-                            } else {
-                                System.out.println("Not found in hashmap: " + line);
-                            }
-                            i++;
-                        }
 
+                                // Check if the candidate met all the requirements
+                                String output;
+                                if (requirementsMatched == requirements.size()) {
+                                    output = candidateName + " is qualified";
+                                } else {
+                                    output = candidateName + " is not qualified";
+                                }
+
+                                // Write the result to the output file
+                                writer.write(output + System.lineSeparator());
+                            }
+                        }
+                        System.out.println("Processing completed. Results written to output2.txt.");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     break;
+
                 case 13:
+                    SalesRecord.viewSalesRecords();
+                    break;
+
+                case 14:
+
+                    // Read the input file (employeePayroll.txt) and process each employee
+                    try (BufferedReader br = new BufferedReader(new FileReader("employeePayroll.txt"));
+                            FileWriter writer = new FileWriter("output3.txt")) {
+
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                // Split the line into the candidate's name, their wage, and their hours
+                                String[] parts = line.split(", ");
+                                String employeeName = parts[0].replace("\"", ""); // Remove quotes around the name
+                                double employeeWage = Double.parseDouble(parts[1]);
+                                int employeeHours = Integer.parseInt(parts[2]);
+
+                                String output;
+                                output = employeeName + ": $" + Payroll.calculateWage(employeeWage, employeeHours)
+                                        + " deposited";
+
+                                // Write the result to the output file
+                                writer.write(output + System.lineSeparator());
+                            }
+                        }
+                        System.out.println("Payment completed. Results written to output3.txt.");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                case 15:
                     ArrayList<String> empty = new ArrayList<>();
-                    store.clearCart(empty); //clear the cart when exiting
+                    store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
@@ -365,4 +455,3 @@ public class Main {
         }
     }
 }
-
