@@ -364,7 +364,6 @@ public class Main {
 
                     break;
 
-
                 case 12:
                     HashMap<Integer, String> requirements = new HashMap<>();
                     requirements.put(1, "full-time student status");
