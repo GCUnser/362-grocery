@@ -3,8 +3,10 @@ import java.util.*;
 
 public class Cart {
     private static String FILE_NAME = "inventory.txt";
+    private static String BASE = "";
     public Cart(String city) {
-        FILE_NAME = "./" + Main.city + "/inventory.txt";
+        FILE_NAME = "./" + city + "/inventory.txt";
+        BASE = "./" + city;
     }
 
 

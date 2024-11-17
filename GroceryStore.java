@@ -1,10 +1,12 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class GroceryStore {
     private static String FILE_NAME = "inventory.txt";
+    private static String BASE = "";
     private List<Item> inventory;
 
     public GroceryStore() {
@@ -14,6 +16,7 @@ public class GroceryStore {
     public GroceryStore(String city) {
         this.inventory = new ArrayList<>();
         FILE_NAME = "./" + city + "/inventory.txt";
+        BASE = "./" + city;
         loadInventory();
     }
 
@@ -94,12 +97,37 @@ public class GroceryStore {
         return null; // Return null if the item is not found
     }
 
-    public double calculateCartCost() {
+    public double calculateCartCost(boolean member) {
         double totalCost = 0.0;
+        Map<String, Double> allSaleItems = new HashMap<>();
+        Map<String, Double> nonMemberSaleItems = new HashMap<>();
 
+        // Load sales from saleItems.txt if it exists
+        Path saleFilePath = Paths.get(BASE + "/saleItems.txt");
+        if (Files.exists(saleFilePath)) {
+            try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
+                String line;
+                while ((line = saleReader.readLine()) != null) {
+                    String[] parts = line.split(",\\s*");
+                    if (parts.length == 3) {
+                        String itemName = parts[0].trim().toLowerCase();
+                        double discount = Double.parseDouble(parts[1]);
+                        boolean isMemberOnly = parts[2].equalsIgnoreCase("true");
+
+                        allSaleItems.put(itemName, discount);
+                        if (!isMemberOnly) {
+                            nonMemberSaleItems.put(itemName, discount);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("Error reading saleItems.txt: " + e.getMessage());
+            }
+        }
+
+        // Calculate cart cost considering sales
         try (BufferedReader reader = new BufferedReader(new FileReader("cart.txt"))) {
             String line;
-
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",\\s*");
                 if (parts.length == 2) {
@@ -110,8 +138,16 @@ public class GroceryStore {
                     Item item = findItemInInventory(itemName);
                     if (item != null) {
                         double pricePerUnit = item.getPrice();
+
+                        // Apply discount based on membership
+                        double discount = member
+                                ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
+                                : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
+
+                        double discountedPrice = pricePerUnit * (1 - discount);
+
                         // Apply tax if the item is taxable
-                        double itemCost = quantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
+                        double itemCost = quantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
                         totalCost += itemCost;
                     } else {
                         System.out.println("Item not found in inventory: " + itemName);
@@ -125,104 +161,116 @@ public class GroceryStore {
         return totalCost;
     }
 
-    public double checkout(int payment, double userMoney, boolean twentyonePlus) {
+
+
+    public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
         StringBuilder recordsContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
-        receiptContent.append("Item\tQuantity\tUnit Price\tTotal Price\n");
-        recordsContent.append("Item\tQuantity\tUnit Price\tTotal Price\n");
+        receiptContent.append("Item\tQuantity\tUnit Price\tDiscount\tTotal Price\n");
+        recordsContent.append("Item\tQuantity\tUnit Price\tDiscount\tTotal Price\n");
         ArrayList<String> itemsToRetainInCart = new ArrayList<>();
+        Map<String, Double> allSaleItems = new HashMap<>();
+        Map<String, Double> nonMemberSaleItems = new HashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("cart.txt"))) {
-            String line;
+        // Load sales if the file exists
+        Path saleFilePath = Paths.get(BASE + "/saleItems.txt");
+        if (Files.exists(saleFilePath)) {
+            try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
+                String line;
+                while ((line = saleReader.readLine()) != null) {
+                    String[] parts = line.split(",\\s*");
+                    if (parts.length == 3) {
+                        String itemName = parts[0].trim().toLowerCase();
+                        double discount = Double.parseDouble(parts[1]);
+                        boolean isMemberOnly = parts[2].equalsIgnoreCase("true");
 
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",\\s*"); // Split by comma and optional whitespace
-                if (parts.length != 2) {
-                    System.out.println("Invalid line format in cart.txt: " + line);
-                    continue;
-                }
-
-                String itemName = parts[0];
-                int requestedQuantity;
-
-                try {
-                    requestedQuantity = Integer.parseInt(parts[1]);
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid quantity in cart.txt for item: " + itemName);
-                    continue;
-                }
-
-                boolean itemFound = false;
-
-                for (Item item : inventory) {
-                    if (item.getName().equalsIgnoreCase(itemName)) {
-                        itemFound = true;
-                        int availableQuantity = item.getQuantity();
-                        double pricePerUnit = item.getPrice();
-                        double itemCost = 0.0;
-                        if (payment != 4 || item.isFoodStampEligible()) {
-                            if (twentyonePlus || !item.forTwentyOnePlus()) {
-                                if (availableQuantity >= requestedQuantity) {
-                                    item.removeDate(requestedQuantity);
-                                    itemCost = requestedQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
-                                    totalCost += itemCost;
-                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName,
-                                            requestedQuantity, pricePerUnit, itemCost));
-
-                                    // Update sales and profit
-                                    updateSalesAndProfit(itemName, requestedQuantity, pricePerUnit, false, false);
-                                    System.out.println("Purchased " + requestedQuantity + " of " + itemName);
-                                } else if (availableQuantity > 0) {
-                                    item.removeDate(availableQuantity);
-                                    itemCost = availableQuantity * pricePerUnit * (item.isTaxable() ? 1.07 : 1.0);
-                                    totalCost += itemCost;
-                                    receiptContent.append(String.format("%s\t%d\t$%.2f\t$%.2f\n", itemName,
-                                            availableQuantity, pricePerUnit, itemCost));
-
-                                    // Update sales and profit
-                                    updateSalesAndProfit(itemName, availableQuantity, pricePerUnit, false, false);
-                                    System.out.println("Only " + availableQuantity + " of " + itemName
-                                            + " available. Purchased all available items.");
-                                } else {
-                                    System.out.println("Item " + itemName + " is out of stock.");
-                                }
-                                break;
-                            } else {
-                                System.out.println("Item " + itemName
-                                        + " requires the customer to be 21 years of age or older. We will return the item for you!");
-                            }
-                        } else {
-                            System.out.println(
-                                    "Item " + itemName + " is not food stamp eligible. Pay with a different method.");
-                            itemsToRetainInCart.add(line);
+                        allSaleItems.put(itemName, discount);
+                        if (!isMemberOnly) {
+                            nonMemberSaleItems.put(itemName, discount);
                         }
                     }
                 }
+            } catch (IOException e) {
+                System.err.println("Error reading saleItems.txt: " + e.getMessage());
+            }
+        }
 
-                if (!itemFound) {
-                    System.out.println("Item " + itemName + " not found in inventory.");
+        try (BufferedReader reader = new BufferedReader(new FileReader("cart.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",\\s*");
+                if (parts.length == 2) {
+                    String itemName = parts[0];
+                    int requestedQuantity;
+
+                    try {
+                        requestedQuantity = Integer.parseInt(parts[1]);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid quantity in cart.txt for item: " + itemName);
+                        continue;
+                    }
+
+                    for (Item item : inventory) {
+                        if (item.getName().equalsIgnoreCase(itemName)) {
+                            int availableQuantity = item.getQuantity();
+                            double pricePerUnit = item.getPrice();
+
+                            // Determine discount
+                            double discount = member
+                                    ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
+                                    : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
+
+                            double discountedPrice = pricePerUnit * (1 - discount);
+                            double itemCost = 0.0;
+
+                            if (payment != 4 || item.isFoodStampEligible()) {
+                                if (twentyonePlus || !item.forTwentyOnePlus()) {
+                                    if (availableQuantity >= requestedQuantity) {
+                                        item.removeDate(requestedQuantity);
+                                        itemCost = requestedQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
+                                        totalCost += itemCost;
+                                        receiptContent.append(String.format("%s\t%d\t$%.2f\t%.2f%%\t$%.2f\n", itemName,
+                                                requestedQuantity, pricePerUnit, discount * 100, itemCost));
+                                    } else if (availableQuantity > 0) {
+                                        item.removeDate(availableQuantity);
+                                        itemCost = availableQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
+                                        totalCost += itemCost;
+                                        receiptContent.append(String.format("%s\t%d\t$%.2f\t%.2f%%\t$%.2f\n", itemName,
+                                                availableQuantity, pricePerUnit, discount * 100, itemCost));
+                                    } else {
+                                        System.out.println("Item " + itemName + " is out of stock.");
+                                    }
+                                } else {
+                                    System.out.println("Item " + itemName + " requires the customer to be 21 or older.");
+                                }
+                            } else {
+                                System.out.println("Item " + itemName + " is not food stamp eligible.");
+                                itemsToRetainInCart.add(line);
+                            }
+                            break;
+                        }
+                    }
                 }
             }
-            if (totalCost > userMoney) {
-                return totalCost;
-            }
-
-            saveInventory(); // Update inventory file after purchase
-            // Clear the cart file
-            clearCart(itemsToRetainInCart);
-            // Generate the receipt
-            generateReceipt(receiptContent.toString(), totalCost);
-            // Add to sales record
-            generateSalesRecord(recordsContent.toString(), totalCost);
-
         } catch (IOException e) {
             System.err.println("Error reading cart.txt: " + e.getMessage());
         }
 
+        if (totalCost > userMoney) {
+            return totalCost;
+        }
+
+        saveInventory();
+        clearCart(itemsToRetainInCart);
+        generateReceipt(receiptContent.toString(), totalCost);
+        generateSalesRecord(recordsContent.toString(), totalCost);
+
         return totalCost;
     }
+
+
 
     public void clearCart(ArrayList<String> itemsToRetain) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("cart.txt"))) {
