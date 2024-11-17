@@ -16,6 +16,7 @@ public class Main {
         String name;
         String category;
         Chain chain = new Chain();
+        SaleItems saleItems = new SaleItems();
 
         List<String> locations = new ArrayList<>();
         boolean valid = false;
@@ -56,9 +57,11 @@ public class Main {
                     System.out.print("Enter the name of the new store location: ");
                     String newLocation = scanner.nextLine();
                     try {
-                        chain.addNewLocation(newLocation);
-                        locations.add(newLocation); // Update the locations list
-                        System.out.println("New store added successfully.");
+                        boolean newStore = chain.addNewLocation(newLocation);
+                        if(newStore) {
+                            locations.add(newLocation); // Update the locations list
+                            System.out.println("New store added successfully.");
+                        }
                     } catch (IOException e) {
                         System.out.println("Error while adding new location: " + e.getMessage());
                     }
@@ -98,7 +101,10 @@ public class Main {
             System.out.println("12. Hiring");
             System.out.println("13. View Sales Records");
             System.out.println("14. Process Payroll");
-            System.out.println("15. Exit");
+            System.out.println("15. Put Item on Sale");
+            System.out.println("16. Take Item off Sale");
+            System.out.println("17. View Items on Sale");
+            System.out.println("18. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -253,6 +259,7 @@ public class Main {
                     int payChoice = 0;
                     boolean validChoice = false;
                     boolean twentyonePlus = false;
+                    boolean member = false;
 
                     while (!validChoice) {
                         System.out.println("1. Card");
@@ -274,18 +281,23 @@ public class Main {
                         twentyonePlus = true;
                     }
                     scanner.nextLine();
+                    System.out.print("Are you a member? (y/n): ");
+                    if (scanner.next().equalsIgnoreCase("y")) {
+                        member = true;
+                    }
+                    scanner.nextLine();
                     System.out.print("Enter the amount you have: $");
                     double userMoney = scanner.nextDouble();
                     scanner.nextLine(); // Consume newline
 
-                    double totalCost = store.calculateCartCost();
+                    double totalCost = store.calculateCartCost(member);
 
                     while (totalCost > userMoney) {
                         System.out.println("You don't have enough money. Let's review your cart.");
                         cart.reviewAndRemoveItems(store, cart, totalCost, userMoney, scanner);
-                        totalCost = store.calculateCartCost();
+                        totalCost = store.calculateCartCost(member);
                     }
-                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus);
+                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member);
                     break;
                 case 7:
                     System.out.print("Enter the item name you want to return: ");
@@ -512,7 +524,31 @@ public class Main {
                     }
                     break;
 
+
                 case 15:
+                    System.out.print("Enter the item to put on sale: ");
+                    name = scanner.nextLine();
+                    System.out.print("Enter the discount (0-1): ");
+                    double discount = scanner.nextDouble();
+                    scanner.nextLine();
+                    System.out.print("Is this discount members only? (y/n): ");
+                    String yOrN = scanner.nextLine();
+                    if(yOrN.equalsIgnoreCase("y")) {
+                        saleItems.addSale(city,name,discount, true);
+                    } else {
+                        saleItems.addSale(city, name, discount, false);
+                    }
+                    break;
+
+                case 16:
+                    System.out.print("Enter the item to take off sale: ");
+                    name = scanner.nextLine();
+                    saleItems.removeSale(city,name);
+                    break;
+                case 17:
+                    saleItems.listSales(city);
+                    break;
+                case 18:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");

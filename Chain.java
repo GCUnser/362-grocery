@@ -1,5 +1,6 @@
 import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Chain {
@@ -12,11 +13,11 @@ public class Chain {
      * @param locationName Name of the new location.
      * @throws IOException if there are issues writing to the file or creating the folder.
      */
-    public void addNewLocation(String locationName) throws IOException {
+    public boolean addNewLocation(String locationName) throws IOException {
         // Check if location already exists
         if (locationExists(locationName)) {
             System.out.println("Location already exists in the chain.");
-            return;
+            return false;
         }
 
         // Add the new location to locations.txt
@@ -34,6 +35,17 @@ public class Chain {
         Files.createFile(inventoryFile);
 
         System.out.println("Successfully added new location: " + locationName);
+
+        // Ask if user wants to stock the store
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Do you want to stock the new store? (y/n): ");
+        String response = scanner.nextLine().trim().toLowerCase();
+
+        if (response.equals("y")) {
+            stockStore(inventoryFile.toString());
+        }
+
+        return true;
     }
 
     /**
@@ -56,19 +68,79 @@ public class Chain {
     }
 
     /**
-     * Main method for testing the Chain class functionality.
+     * Stocks the store by allowing the user to add items to the inventory.
+     *
+     * @param inventoryFilePath Path to the inventory file.
+     * @throws IOException if there are issues writing to the file.
      */
-    public static void main(String[] args) {
+    private void stockStore(String inventoryFilePath) throws IOException {
         Scanner scanner = new Scanner(System.in);
-        Chain chain = new Chain();
 
-        System.out.print("Enter the name of the new store location: ");
-        String newLocation = scanner.nextLine();
+        boolean addingItems = true;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(inventoryFilePath, true))) {
+            while (addingItems) {
+                System.out.println("\nAdd a new item to the store:");
 
-        try {
-            chain.addNewLocation(newLocation);
-        } catch (IOException e) {
-            System.out.println("Error while adding new location: " + e.getMessage());
+                System.out.print("Item name: ");
+                String name = scanner.nextLine();
+
+                System.out.print("Category: ");
+                String category = scanner.nextLine();
+
+                System.out.print("Price: ");
+                double price = Double.parseDouble(scanner.nextLine());
+
+                boolean taxable = getYesNoInput(scanner, "Is the item taxable? (y/n): ");
+                boolean foodStamp = getYesNoInput(scanner, "Is the item eligible for food stamps? (y/n): ");
+                boolean twentyOnePlus = getYesNoInput(scanner, "Is the item for 21+ only? (y/n): ");
+
+                System.out.print("Quantity: ");
+                int quantity = Integer.parseInt(scanner.nextLine());
+
+                System.out.print("Expiration date for all items (yyyy-mm-dd): ");
+                String expirationDate = scanner.nextLine();
+
+                // Create the date list with the same expiration date for all items
+                ArrayList<String> dateList = new ArrayList<>();
+                for (int i = 0; i < quantity; i++) {
+                    dateList.add(expirationDate);
+                }
+
+                // Create a new Item instance
+                Item item = new Item(name, category, price, taxable, foodStamp, twentyOnePlus, quantity, dateList);
+
+                // Write item to the inventory file
+                writer.write(item.toString());
+                writer.newLine();
+
+                System.out.println("Item added: " + item);
+
+                // Ask if user wants to add another item
+                addingItems = getYesNoInput(scanner, "Do you want to add another item? (y/n): ");
+            }
+        }
+
+        System.out.println("Finished stocking the store.");
+    }
+
+    /**
+     * Helper method to get a "yes" or "no" input from the user.
+     *
+     * @param scanner Scanner for user input.
+     * @param prompt  Prompt message.
+     * @return true if the user responds with "y", false otherwise.
+     */
+    private boolean getYesNoInput(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String response = scanner.nextLine().trim().toLowerCase();
+            if (response.equals("y")) {
+                return true;
+            } else if (response.equals("n")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter 'y' or 'n'.");
+            }
         }
     }
 }
