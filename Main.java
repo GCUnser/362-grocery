@@ -6,13 +6,82 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    public static String city;
+    private static final String INVENTORY_FILE_PATH = "./"; // Base path for inventory files
     public static void main(String[] args) throws IOException {
-        GroceryStore store = new GroceryStore();
+
         Scanner scanner = new Scanner(System.in);
-        Cart cart = new Cart();
+
         int quantity;
         String name;
         String category;
+        Chain chain = new Chain();
+
+        List<String> locations = new ArrayList<>();
+        boolean valid = false;
+
+        // Read locations from file
+        String filePath = "locations.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty()) { // Skip empty lines
+                    locations.add(line.trim());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+            return;
+        }
+
+        // Ensure there are locations available
+        if (locations.isEmpty()) {
+            System.out.println("No locations found in the file.");
+        }
+
+        // Allow user to choose a location or add a new store
+        while (!valid) {
+            System.out.println("Choose an option:");
+            System.out.println("1. Add a new store location");
+            for (int i = 0; i < locations.size(); i++) {
+                System.out.println((i + 2) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new store"
+            }
+            System.out.print("Enter the number of your choice: ");
+            String input = scanner.nextLine();
+
+            try {
+                int choice = Integer.parseInt(input);
+
+                if (choice == 1) { // Add a new store location
+                    System.out.print("Enter the name of the new store location: ");
+                    String newLocation = scanner.nextLine();
+                    try {
+                        chain.addNewLocation(newLocation);
+                        locations.add(newLocation); // Update the locations list
+                        System.out.println("New store added successfully.");
+                    } catch (IOException e) {
+                        System.out.println("Error while adding new location: " + e.getMessage());
+                    }
+                } else if (choice >= 2 && choice <= locations.size() + 1) {
+                    city = locations.get(choice - 2); // Offset by 2 since option 1 is "Add a new store"
+                    System.out.println("You selected: " + city);
+                    valid = true;
+                } else {
+                    System.out.println("Invalid choice. Please select a number between 1 and " + (locations.size() + 1) + ".");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+
+        // Initialize inventory file path based on the selected city
+        String inventoryFilePath = INVENTORY_FILE_PATH + city + "/inventory.txt";
+        System.out.println("Using inventory file: " + inventoryFilePath);
+
+        // Initialize GroceryStore and Cart with the selected city
+        GroceryStore store = new GroceryStore(city);
+        Cart cart = new Cart(city);
+
 
         while (true) {
             System.out.println("1. Add Item");

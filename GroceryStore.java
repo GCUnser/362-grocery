@@ -4,11 +4,16 @@ import java.util.Collections;
 import java.util.List;
 
 public class GroceryStore {
-    private static final String FILE_NAME = "inventory.txt";
+    private static String FILE_NAME = "inventory.txt";
     private List<Item> inventory;
 
     public GroceryStore() {
         this.inventory = new ArrayList<>();
+        loadInventory();
+    }
+    public GroceryStore(String city) {
+        this.inventory = new ArrayList<>();
+        FILE_NAME = "./" + city + "/inventory.txt";
         loadInventory();
     }
 
