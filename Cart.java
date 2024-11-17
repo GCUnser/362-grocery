@@ -2,6 +2,11 @@ import java.io.*;
 import java.util.*;
 
 public class Cart {
+    private static String FILE_NAME = "inventory.txt";
+    public Cart(String city) {
+        FILE_NAME = "./" + Main.city + "/inventory.txt";
+    }
+
 
     // Cart items are stored in cart.txt in the format: ItemName, Quantity
     public void addItemToCart(String itemName, int quantityToAdd) {
@@ -107,7 +112,7 @@ public class Cart {
     private double getPriceForItem(String cartItemName) {
         double price = -1.0;  // Default value indicating the item is not found
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("inventory.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",\\s*");  // Split by comma and optional whitespace

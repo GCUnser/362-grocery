@@ -1,5 +1,6 @@
 Receipt:
 Item	Quantity	Unit Price	Total Price
+beer	1	$8.99	$9.62
 
-Total Cost: $0.00
+Total Cost: $9.62
 Thank you for shopping with us!
