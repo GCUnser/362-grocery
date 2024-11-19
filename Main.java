@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class Main {
     public static String city;
     private static final String INVENTORY_FILE_PATH = "./"; // Base path for inventory files
+
     public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
@@ -45,7 +46,8 @@ public class Main {
             System.out.println("Choose an option:");
             System.out.println("1. Add a new store location");
             for (int i = 0; i < locations.size(); i++) {
-                System.out.println((i + 2) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new store"
+                System.out.println((i + 2) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new
+                                                                       // store"
             }
             System.out.print("Enter the number of your choice: ");
             String input = scanner.nextLine();
@@ -58,7 +60,7 @@ public class Main {
                     String newLocation = scanner.nextLine();
                     try {
                         boolean newStore = chain.addNewLocation(newLocation);
-                        if(newStore) {
+                        if (newStore) {
                             locations.add(newLocation); // Update the locations list
                             System.out.println("New store added successfully.");
                         }
@@ -70,7 +72,8 @@ public class Main {
                     System.out.println("You selected: " + city);
                     valid = true;
                 } else {
-                    System.out.println("Invalid choice. Please select a number between 1 and " + (locations.size() + 1) + ".");
+                    System.out.println(
+                            "Invalid choice. Please select a number between 1 and " + (locations.size() + 1) + ".");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -84,7 +87,6 @@ public class Main {
         // Initialize GroceryStore and Cart with the selected city
         GroceryStore store = new GroceryStore(city);
         Cart cart = new Cart(city);
-
 
         while (true) {
             System.out.println("1. Add Item");
@@ -524,7 +526,6 @@ public class Main {
                     }
                     break;
 
-
                 case 15:
                     System.out.print("Enter the item to put on sale: ");
                     name = scanner.nextLine();
@@ -533,8 +534,8 @@ public class Main {
                     scanner.nextLine();
                     System.out.print("Is this discount members only? (y/n): ");
                     String yOrN = scanner.nextLine();
-                    if(yOrN.equalsIgnoreCase("y")) {
-                        saleItems.addSale(city,name,discount, true);
+                    if (yOrN.equalsIgnoreCase("y")) {
+                        saleItems.addSale(city, name, discount, true);
                     } else {
                         saleItems.addSale(city, name, discount, false);
                     }
@@ -543,7 +544,7 @@ public class Main {
                 case 16:
                     System.out.print("Enter the item to take off sale: ");
                     name = scanner.nextLine();
-                    saleItems.removeSale(city,name);
+                    saleItems.removeSale(city, name);
                     break;
                 case 17:
                     saleItems.listSales(city);
@@ -554,6 +555,30 @@ public class Main {
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
+                case 19:
+                    System.out.println("Enter manager name");
+                    String managerName = scanner.nextLine();
+                    System.out.println("Enter manager ID");
+                    String managerID = scanner.nextLine();
+                    System.out.println("Enter employee name");
+                    String employeeName = scanner.nextLine();
+                    System.out.println("Enter employee ID");
+                    String employeeID = scanner.nextLine();
+                    System.out.println("Type \"confirm\" to approve promotion");
+
+                    if (scanner.next().equalsIgnoreCase("confirm")) {
+                        EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
+                                managerName);
+                        try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
+                            writer.write(promotion.toString());
+                            System.out.println("Promotion approved, results written to employee_promotions.txt");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.out.println("Promotion cancelled");
+                    }
+
                 default:
                     System.out.println("Invalid choice, please try again.");
             }
