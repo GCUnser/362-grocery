@@ -1,5 +1,6 @@
 Receipt:
-Item	Quantity	Unit Price	Total Price
+Item	Quantity	Unit Price	Discount	Total Price
+cereal	1	$2.88	15.00%	$2.62
 
-Total Cost: $0.00
+Total Cost: $2.62
 Thank you for shopping with us!
