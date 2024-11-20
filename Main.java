@@ -290,14 +290,14 @@ public class Main {
                     double userMoney = scanner.nextDouble();
                     scanner.nextLine(); // Consume newline
 
-                    double totalCost = store.calculateCartCost(member);
+                    double totalCost = store.calculateCartCost(member, city);
 
                     while (totalCost > userMoney) {
                         System.out.println("You don't have enough money. Let's review your cart.");
                         cart.reviewAndRemoveItems(store, cart, totalCost, userMoney, scanner);
-                        totalCost = store.calculateCartCost(member);
+                        totalCost = store.calculateCartCost(member, city);
                     }
-                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member);
+                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member, city);
                     break;
                 case 7:
                     System.out.print("Enter the item name you want to return: ");
@@ -533,10 +533,18 @@ public class Main {
                     scanner.nextLine();
                     System.out.print("Is this discount members only? (y/n): ");
                     String yOrN = scanner.nextLine();
+                    System.out.print("Is there a limit on how many items the customer can buy on sale? (y/n): ");
+                    String limitExists = scanner.nextLine();
+                    String limit = "N/A";
+                    if(limitExists.equalsIgnoreCase("y")) {
+                        System.out.print("Enter the limit: ");
+                        limit = scanner.next();
+                        scanner.nextLine();
+                    }
                     if(yOrN.equalsIgnoreCase("y")) {
-                        saleItems.addSale(city,name,discount, true);
+                        saleItems.addSale(city,name,discount, true, limit);
                     } else {
-                        saleItems.addSale(city, name, discount, false);
+                        saleItems.addSale(city, name, discount, false, limit);
                     }
                     break;
 
