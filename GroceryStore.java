@@ -97,24 +97,27 @@ public class GroceryStore {
         return null; // Return null if the item is not found
     }
 
-    public double calculateCartCost(boolean member, String cityName) {
+    public double calculateCartCost(boolean member) {
         double totalCost = 0.0;
         Map<String, Double> allSaleItems = new HashMap<>();
         Map<String, Double> nonMemberSaleItems = new HashMap<>();
+        Map<String, Integer> saleLimits = new HashMap<>();
 
         // Load sales from saleItems.txt for the specified city
-        Path saleFilePath = Paths.get(cityName, "saleItems.txt");
+        Path saleFilePath = Paths.get(BASE, "saleItems.txt");
         if (Files.exists(saleFilePath)) {
             try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
                 String line;
                 while ((line = saleReader.readLine()) != null) {
                     String[] parts = line.split(",\\s*");
-                    if (parts.length >= 3) { // Ignoring the `limit` field for now
+                    if (parts.length >= 4) {
                         String itemName = parts[0].trim().toLowerCase();
                         double discount = Double.parseDouble(parts[1]);
                         boolean isMemberOnly = Boolean.parseBoolean(parts[2]);
+                        int limit = parts[3].equalsIgnoreCase("N/A") ? Integer.MAX_VALUE : Integer.parseInt(parts[3]);
 
                         allSaleItems.put(itemName, discount);
+                        saleLimits.put(itemName, limit);
                         if (!isMemberOnly) {
                             nonMemberSaleItems.put(itemName, discount);
                         }
@@ -125,30 +128,45 @@ public class GroceryStore {
             }
         }
 
-        // Calculate cart cost considering sales
+        // Calculate cart cost considering sales and limits
         try (BufferedReader reader = new BufferedReader(new FileReader("cart.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",\\s*");
                 if (parts.length == 2) {
                     String itemName = parts[0];
-                    int quantity = Integer.parseInt(parts[1]);
+                    int requestedQuantity;
+
+                    try {
+                        requestedQuantity = Integer.parseInt(parts[1]);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid quantity in cart.txt for item: " + itemName);
+                        continue;
+                    }
 
                     // Find the item in inventory
                     Item item = findItemInInventory(itemName);
                     if (item != null) {
                         double pricePerUnit = item.getPrice();
 
-                        // Apply discount based on membership
+                        // Determine discount and limit
                         double discount = member
                                 ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
                                 : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
+                        int limit = saleLimits.getOrDefault(itemName.toLowerCase(), Integer.MAX_VALUE);
+
+                        // Adjust quantity based on limit
+                        int eligibleQuantity = Math.min(requestedQuantity, limit);
 
                         double discountedPrice = pricePerUnit * (1 - discount);
+                        double itemCost = eligibleQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
 
-                        // Apply tax if the item is taxable
-                        double itemCost = quantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
                         totalCost += itemCost;
+
+                        // Inform if remaining quantity exceeded limit
+                        if (requestedQuantity > limit) {
+                            System.out.println("Note: Sale limit of " + limit + " applied to " + itemName + ".");
+                        }
                     } else {
                         System.out.println("Item not found in inventory: " + itemName);
                     }
@@ -161,7 +179,8 @@ public class GroceryStore {
         return totalCost;
     }
 
-    public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member, String cityName) {
+
+    public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
@@ -172,7 +191,7 @@ public class GroceryStore {
         Map<String, Integer> saleLimits = new HashMap<>();
 
         // Load sales for the specified city
-        Path saleFilePath = Paths.get(cityName, "saleItems.txt");
+        Path saleFilePath = Paths.get(BASE, "saleItems.txt");
         if (Files.exists(saleFilePath)) {
             try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
                 String line;

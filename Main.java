@@ -290,14 +290,14 @@ public class Main {
                     double userMoney = scanner.nextDouble();
                     scanner.nextLine(); // Consume newline
 
-                    double totalCost = store.calculateCartCost(member, city);
+                    double totalCost = store.calculateCartCost(member);
 
                     while (totalCost > userMoney) {
                         System.out.println("You don't have enough money. Let's review your cart.");
                         cart.reviewAndRemoveItems(store, cart, totalCost, userMoney, scanner);
-                        totalCost = store.calculateCartCost(member, city);
+                        totalCost = store.calculateCartCost(member);
                     }
-                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member, city);
+                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member);
                     break;
                 case 7:
                     System.out.print("Enter the item name you want to return: ");
