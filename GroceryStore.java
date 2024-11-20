@@ -97,22 +97,22 @@ public class GroceryStore {
         return null; // Return null if the item is not found
     }
 
-    public double calculateCartCost(boolean member) {
+    public double calculateCartCost(boolean member, String cityName) {
         double totalCost = 0.0;
         Map<String, Double> allSaleItems = new HashMap<>();
         Map<String, Double> nonMemberSaleItems = new HashMap<>();
 
-        // Load sales from saleItems.txt if it exists
-        Path saleFilePath = Paths.get(BASE + "/saleItems.txt");
+        // Load sales from saleItems.txt for the specified city
+        Path saleFilePath = Paths.get(cityName, "saleItems.txt");
         if (Files.exists(saleFilePath)) {
             try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
                 String line;
                 while ((line = saleReader.readLine()) != null) {
                     String[] parts = line.split(",\\s*");
-                    if (parts.length == 3) {
+                    if (parts.length >= 3) { // Ignoring the `limit` field for now
                         String itemName = parts[0].trim().toLowerCase();
                         double discount = Double.parseDouble(parts[1]);
-                        boolean isMemberOnly = parts[2].equalsIgnoreCase("true");
+                        boolean isMemberOnly = Boolean.parseBoolean(parts[2]);
 
                         allSaleItems.put(itemName, discount);
                         if (!isMemberOnly) {
@@ -161,32 +161,31 @@ public class GroceryStore {
         return totalCost;
     }
 
-
-
-    public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member) {
+    public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member, String cityName) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
-        StringBuilder recordsContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
         receiptContent.append("Item\tQuantity\tUnit Price\tDiscount\tTotal Price\n");
-        recordsContent.append("Item\tQuantity\tUnit Price\tDiscount\tTotal Price\n");
         ArrayList<String> itemsToRetainInCart = new ArrayList<>();
         Map<String, Double> allSaleItems = new HashMap<>();
         Map<String, Double> nonMemberSaleItems = new HashMap<>();
+        Map<String, Integer> saleLimits = new HashMap<>();
 
-        // Load sales if the file exists
-        Path saleFilePath = Paths.get(BASE + "/saleItems.txt");
+        // Load sales for the specified city
+        Path saleFilePath = Paths.get(cityName, "saleItems.txt");
         if (Files.exists(saleFilePath)) {
             try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
                 String line;
                 while ((line = saleReader.readLine()) != null) {
                     String[] parts = line.split(",\\s*");
-                    if (parts.length == 3) {
+                    if (parts.length >= 4) {
                         String itemName = parts[0].trim().toLowerCase();
                         double discount = Double.parseDouble(parts[1]);
-                        boolean isMemberOnly = parts[2].equalsIgnoreCase("true");
+                        boolean isMemberOnly = Boolean.parseBoolean(parts[2]);
+                        int limit = parts[3].equalsIgnoreCase("N/A") ? Integer.MAX_VALUE : Integer.parseInt(parts[3]);
 
                         allSaleItems.put(itemName, discount);
+                        saleLimits.put(itemName, limit);
                         if (!isMemberOnly) {
                             nonMemberSaleItems.put(itemName, discount);
                         }
@@ -217,22 +216,26 @@ public class GroceryStore {
                             int availableQuantity = item.getQuantity();
                             double pricePerUnit = item.getPrice();
 
-                            // Determine discount
+                            // Determine discount and limit
                             double discount = member
                                     ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
                                     : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
+                            int limit = saleLimits.getOrDefault(itemName.toLowerCase(), Integer.MAX_VALUE);
+
+                            // Adjust quantity based on limit
+                            int eligibleQuantity = Math.min(requestedQuantity, limit);
 
                             double discountedPrice = pricePerUnit * (1 - discount);
                             double itemCost = 0.0;
 
                             if (payment != 4 || item.isFoodStampEligible()) {
                                 if (twentyonePlus || !item.forTwentyOnePlus()) {
-                                    if (availableQuantity >= requestedQuantity) {
-                                        item.removeDate(requestedQuantity);
-                                        itemCost = requestedQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
+                                    if (availableQuantity >= eligibleQuantity) {
+                                        item.removeDate(eligibleQuantity);
+                                        itemCost = eligibleQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
                                         totalCost += itemCost;
                                         receiptContent.append(String.format("%s\t%d\t$%.2f\t%.2f%%\t$%.2f\n", itemName,
-                                                requestedQuantity, pricePerUnit, discount * 100, itemCost));
+                                                eligibleQuantity, pricePerUnit, discount * 100, itemCost));
                                     } else if (availableQuantity > 0) {
                                         item.removeDate(availableQuantity);
                                         itemCost = availableQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
@@ -265,10 +268,10 @@ public class GroceryStore {
         saveInventory();
         clearCart(itemsToRetainInCart);
         generateReceipt(receiptContent.toString(), totalCost);
-        generateSalesRecord(recordsContent.toString(), totalCost);
 
         return totalCost;
     }
+
 
 
 

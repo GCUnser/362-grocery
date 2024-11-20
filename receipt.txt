@@ -1,6 +1,6 @@
 Receipt:
 Item	Quantity	Unit Price	Discount	Total Price
-cereal	1	$2.88	15.00%	$2.62
+pear	2	$0.87	2.00%	$1.71
 
-Total Cost: $2.62
+Total Cost: $1.71
 Thank you for shopping with us!
