@@ -449,6 +449,21 @@ public class Main {
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
+
+                case 16:
+                    //Transfer employees to a new store
+
+                    HashMap<Integer, List<String>> transferEmployees = new HashMap<>();
+                    HashMap<Integer, String> storeBranch = new HashMap<>();
+
+                    //Iterate over the txt file and check if the employee will be transferring or not(true or false)
+                    //If so then ask the employee which store they would like to transfer to
+
+
+
+
+
+
                 default:
                     System.out.println("Invalid choice, please try again.");
             }
