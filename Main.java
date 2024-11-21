@@ -104,10 +104,13 @@ public class Main {
             System.out.println("15. Put Item on Sale");
             System.out.println("16. Take Item off Sale");
             System.out.println("17. View Items on Sale");
-            System.out.println("18. Exit");
+            System.out.println("19. Transfer Employees");
+            System.out.println("20. Employees currently on the clock");
+            System.out.println("21. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
+
 
             switch (choice) {
                 case 1:
@@ -563,19 +566,157 @@ public class Main {
                     scanner.close();
                     return;
 
-                case 16:
+                case 19:
                     //Transfer employees to a new store
 
-                    HashMap<Integer, List<String>> transferEmployees = new HashMap<>();
+                    HashMap<Integer, String> transferEmployees = new HashMap<>();
                     HashMap<Integer, String> storeBranch = new HashMap<>();
 
-                    //Iterate over the txt file and check if the employee will be transferring or not(true or false)
-                    //If so then ask the employee which store they would like to transfer to
+// Load employee data from file
+                    try (BufferedReader br = new BufferedReader(new FileReader("transferEmployees.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                String[] parts = line.split(", ");
+                                int id = Integer.parseInt(parts[0].trim());
+                                String employeeName = parts[1].replace("\"", "").trim();
+                                transferEmployees.put(id, employeeName);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+// Load store branch data from file
+                    try (BufferedReader br = new BufferedReader(new FileReader("storeBranch.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                String[] parts = line.split(", ");
+                                int id = Integer.parseInt(parts[0].trim());
+                                String branch = parts[1].replace("\"", "").trim();
+                                storeBranch.put(id, branch);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+// Use the existing Scanner object for user input
+                    try (FileWriter writer = new FileWriter("transferResults.txt")) {
+                        for (int employeeId : transferEmployees.keySet()) {
+                            String employeeName = transferEmployees.get(employeeId);
+
+                            // Ask if the employee wants to transfer
+                            String response = null;
+                            while (true) {
+                                System.out.println("Would " + employeeName + " like to transfer to a new store? (yes/no)");
+
+                                // Use the existing scanner object for input
+                                if (scanner.hasNextLine()) {
+                                    response = scanner.nextLine().trim().toLowerCase();
+                                    if (response.equals("yes") || response.equals("no")) {
+                                        break; // Valid response, break out of the loop
+                                    } else {
+                                        System.out.println("Invalid response. Please type 'yes' or 'no'.");
+                                    }
+                                } else {
+                                    System.out.println("No input detected. Skipping employee " + employeeName + ".");
+                                    return; // Exit the loop or program if no input
+                                }
+                            }
+
+                            if (response.equals("yes")) {
+                                // Show available store branches
+                                System.out.println("Available store branches:");
+                                for (int branchId : storeBranch.keySet()) {
+                                    System.out.println(branchId + ". " + storeBranch.get(branchId));
+                                }
+
+                                // Prompt for branch ID
+                                int chosenBranchId = -1;
+                                while (true) {
+                                    System.out.println("Enter the ID of the store branch " + employeeName + " wants to transfer to:");
+
+                                    // Validate user input for store branch ID
+                                    if (scanner.hasNextLine()) {
+                                        String input = scanner.nextLine().trim();
+                                        try {
+                                            chosenBranchId = Integer.parseInt(input);
+                                            if (storeBranch.containsKey(chosenBranchId)) {
+                                                break; // Valid branch ID
+                                            } else {
+                                                System.out.println("Invalid branch ID. Please try again.");
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            System.out.println("Invalid input. Please enter a valid number.");
+                                        }
+                                    } else {
+                                        System.out.println("No input detected for branch ID. Skipping.");
+                                        return; // Exit if no input is detected
+                                    }
+                                }
+
+                                String chosenBranch = storeBranch.get(chosenBranchId);
+                                writer.write(employeeName + " will transfer to " + chosenBranch + System.lineSeparator());
+                                System.out.println(employeeName + " will transfer to " + chosenBranch + ".");
+                            } else {
+                                writer.write(employeeName + " will not transfer to a new store." + System.lineSeparator());
+                            }
+                        }
+
+                        System.out.println("Transfer decisions have been recorded in transferResults.txt.");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
 
+                    break;
 
 
+                case 20:
 
+                    HashMap<Integer, String> employeesWorking = new HashMap<>();
+                    int empCount = 0;
+
+                    // Read the employeesWorking.txt file
+                    try (BufferedReader br = new BufferedReader(new FileReader("employeesWorking.txt"));
+                         FileWriter writer = new FileWriter("employeesWorkingResult.txt")) {
+
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                // Split the line into parts
+                                String[] parts = line.split(", ");
+                                int id = Integer.parseInt(parts[0].trim());
+                                String empName = parts[1].replace("\"", "").trim();
+                                String workingStatus = parts[2].replace("\"", "").trim();
+
+                                // Add employee to the HashMap
+                                employeesWorking.put(id, empName);
+
+                                // Write the employee's status to the file
+                                writer.write(empName + " is " + (workingStatus.equalsIgnoreCase("Yes") ? "currently on the clock." : "not on the clock.") + "\n");
+
+                                // Increase empCount if workingStatus is "Yes"
+                                if (workingStatus.equalsIgnoreCase("Yes")) {
+                                    empCount++;
+                                }
+                            }
+                        }
+
+                        // Write the total number of employees on the clock
+                        writer.write("Total employees on the clock: " + empCount + "\n");
+                        System.out.println("Output written to employeesWorkingResult.txt.");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    break;
 
                 default:
                     System.out.println("Invalid choice, please try again.");

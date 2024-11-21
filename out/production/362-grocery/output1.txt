@@ -1,2 +1,2 @@
-Violation: time fraud
-Action: Fired Molly
+Violation: absent for work more than 3 times without manager approval
+Action: Fired Lauren
