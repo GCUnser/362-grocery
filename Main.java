@@ -104,13 +104,13 @@ public class Main {
             System.out.println("15. Put Item on Sale");
             System.out.println("16. Take Item off Sale");
             System.out.println("17. View Items on Sale");
-            System.out.println("19. Transfer Employees");
-            System.out.println("20. Employees currently on the clock");
+            System.out.println("18. Transfer Employees");
+            System.out.println("19. Employees currently on the clock");
+            System.out.println("20. Remove Store from Chain");
             System.out.println("21. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
-
 
             switch (choice) {
                 case 1:
@@ -141,11 +141,7 @@ public class Main {
                             }
                             System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
                             String date = scanner.next();
-                            if (quantity == 1) {
-                                i.addQuantity(date);
-                            } else if (quantity > 1) {
-                                i.addQuantity(date, quantity);
-                            }
+                            store.addItemQuantity(date, quantity, i);
                             correctName = false;
                             break;
                         }
@@ -161,25 +157,13 @@ public class Main {
                     double price = scanner.nextDouble();
                     System.out.print("Enter if item is Taxable (y or n): ");
                     boolean taxable;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        taxable = true;
-                    } else {
-                        taxable = false;
-                    }
+                    taxable = scanner.next().equalsIgnoreCase("y");
                     System.out.print("Enter if item is applicable for Food Stamps (y or n): ");
                     boolean foodStamp;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        foodStamp = true;
-                    } else {
-                        foodStamp = false;
-                    }
+                    foodStamp = scanner.next().equalsIgnoreCase("y");
                     System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
                     boolean twentyOnePlus;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        twentyOnePlus = true;
-                    } else {
-                        twentyOnePlus = false;
-                    }
+                    twentyOnePlus = scanner.next().equalsIgnoreCase("y");
                     scanner.nextLine(); // Consume newline
 
                     Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
@@ -559,14 +543,8 @@ public class Main {
                 case 17:
                     saleItems.listSales(city);
                     break;
-                case 18:
-                    ArrayList<String> empty = new ArrayList<>();
-                    store.clearCart(empty); // clear the cart when exiting
-                    System.out.println("Exiting...");
-                    scanner.close();
-                    return;
 
-                case 19:
+                case 18:
                     //Transfer employees to a new store
 
                     HashMap<Integer, String> transferEmployees = new HashMap<>();
@@ -677,7 +655,7 @@ public class Main {
                     break;
 
 
-                case 20:
+                case 19:
 
                     HashMap<Integer, String> employeesWorking = new HashMap<>();
                     int empCount = 0;
@@ -717,6 +695,29 @@ public class Main {
                     }
 
                     break;
+
+                case 20:
+                    List<Item> itemList;
+                    itemList = store.removeFiles();
+                    for(Item toAdd: itemList)
+                    {
+                        chain.addItemToStock(toAdd);
+                        chain.removeLocation(city);
+                    }
+                    System.out.println("Removed city from chain, exiting program.");
+                    ArrayList<String> end = new ArrayList<>();
+                    store.clearCart(end); // clear the cart when exiting
+                    scanner.close();
+                    return;
+
+                case 21:
+                    ArrayList<String> empty = new ArrayList<>();
+                    store.clearCart(empty); // clear the cart when exiting
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+
+
 
                 default:
                     System.out.println("Invalid choice, please try again.");

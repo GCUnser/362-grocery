@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class GroceryStore {
-    private static String FILE_NAME = "inventory.txt";
+    private String fileName;
     private static String BASE = "";
     private List<Item> inventory;
 
@@ -15,13 +15,19 @@ public class GroceryStore {
     }
     public GroceryStore(String city) {
         this.inventory = new ArrayList<>();
-        FILE_NAME = "./" + city + "/inventory.txt";
+        fileName = "./" + city + "/inventory.txt";
         BASE = "./" + city;
         loadInventory();
     }
 
     public void addItem(Item item) {
         inventory.add(item);
+        saveInventory();
+    }
+
+    public void addItemQuantity(String date, int quantity, Item i)
+    {
+        i.addQuantity(date, quantity);
         saveInventory();
     }
 
@@ -417,6 +423,22 @@ public class GroceryStore {
         }
     }
 
+    public List<Item> removeFiles()
+    {
+        File f = new File(BASE);
+        if(f.isDirectory())
+        {
+            File[] files = f.listFiles();
+            assert files != null;
+            for(int i = files.length - 1; i >= 0; i--)
+            {
+                files[i].delete();
+            }
+        }
+        f.delete();
+        return inventory;
+    }
+
     private void updateReceiptFile(String updatedReceiptContent) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("receipt.txt"))) {
             writer.write(updatedReceiptContent);
@@ -500,7 +522,7 @@ public class GroceryStore {
     }
 
     private void loadInventory() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 inventory.add(Item.fromString(line));
@@ -511,7 +533,7 @@ public class GroceryStore {
     }
 
     private void saveInventory() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Item item : inventory) {
                 writer.write(item.toString());
                 writer.newLine();

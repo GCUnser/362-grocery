@@ -33,24 +33,6 @@ public class Item implements Serializable {
         this.date = new ArrayList<>(date);
     }
 
-    public void addQuantity(String date) {
-        for(int j = 0; j <= this.date.size(); j++)
-        {
-            if(j == this.date.size())
-            {
-                this.date.add(date);
-                break;
-            }
-            else if(date.compareTo(this.date.get(j)) < 0)
-            {
-                this.date.add(j, date);
-                break;
-            }
-
-        }
-        quantity += 1;
-    }
-
     public void addQuantity(String date, int quantity) {
         this.quantity += quantity;
         for(int j = 0; j <= this.date.size(); j++)
