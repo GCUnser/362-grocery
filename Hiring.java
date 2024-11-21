@@ -13,6 +13,5 @@ public class Hiring {
         this.position = position;
         this.willHire = willHire;
         this.hourlyRate = hourlyRate;
-
     }
 }

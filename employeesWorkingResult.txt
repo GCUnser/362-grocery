@@ -1,0 +1,11 @@
+Jake is currently on the clock.
+Lexi is not on the clock.
+Maria is currently on the clock.
+Lauren is currently on the clock.
+Abby is currently on the clock.
+Victor is currently on the clock.
+Richard is currently on the clock.
+Tejas is currently on the clock.
+Tom is currently on the clock.
+Emily is not on the clock.
+Total employees on the clock: 8
