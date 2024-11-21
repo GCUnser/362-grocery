@@ -106,6 +106,9 @@ public class Main {
             System.out.println("15. Put Item on Sale");
             System.out.println("16. Take Item off Sale");
             System.out.println("17. View Items on Sale");
+            System.out.println("21. Employee promotion");
+            System.out.println("22. View product promotions");
+
             System.out.println("18. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
@@ -555,7 +558,7 @@ public class Main {
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
-                case 19:
+                case 21:
                     System.out.println("Enter manager name");
                     String managerName = scanner.nextLine();
                     System.out.println("Enter manager ID");
@@ -577,6 +580,17 @@ public class Main {
                         }
                     } else {
                         System.out.println("Promotion cancelled");
+                    }
+                case 22:
+                    HashMap<String, Integer> promotions = new HashMap<String, Integer>();
+                    promotions.put("wirhjoiwrhj", 92306709);
+                    promotions.put("i5rhjoiwh", 49683946);
+                    promotions.put("kbgmnlklrit", 58075789);
+
+                    System.out.println("Current promotions:");
+
+                    for (String s : promotions.keySet()) {
+                        System.out.println("\n" + s + ": " + promotions.get(s) + " weeks");
                     }
 
                 default:
