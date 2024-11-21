@@ -157,25 +157,13 @@ public class Main {
                     double price = scanner.nextDouble();
                     System.out.print("Enter if item is Taxable (y or n): ");
                     boolean taxable;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        taxable = true;
-                    } else {
-                        taxable = false;
-                    }
+                    taxable = scanner.next().equalsIgnoreCase("y");
                     System.out.print("Enter if item is applicable for Food Stamps (y or n): ");
                     boolean foodStamp;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        foodStamp = true;
-                    } else {
-                        foodStamp = false;
-                    }
+                    foodStamp = scanner.next().equalsIgnoreCase("y");
                     System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
                     boolean twentyOnePlus;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        twentyOnePlus = true;
-                    } else {
-                        twentyOnePlus = false;
-                    }
+                    twentyOnePlus = scanner.next().equalsIgnoreCase("y");
                     scanner.nextLine(); // Consume newline
 
                     Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
