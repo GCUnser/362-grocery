@@ -104,7 +104,8 @@ public class Main {
             System.out.println("15. Put Item on Sale");
             System.out.println("16. Take Item off Sale");
             System.out.println("17. View Items on Sale");
-            System.out.println("18. Exit");
+            System.out.println("18. Remove Store from Chain");
+            System.out.println("19. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -138,11 +139,7 @@ public class Main {
                             }
                             System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
                             String date = scanner.next();
-                            if (quantity == 1) {
-                                i.addQuantity(date);
-                            } else if (quantity > 1) {
-                                i.addQuantity(date, quantity);
-                            }
+                            store.addItemQuantity(date, quantity, i);
                             correctName = false;
                             break;
                         }
@@ -548,7 +545,22 @@ public class Main {
                 case 17:
                     saleItems.listSales(city);
                     break;
+
                 case 18:
+                    List<Item> itemList;
+                    itemList = store.removeFiles();
+                    for(Item toAdd: itemList)
+                    {
+                        chain.addItemToStock(toAdd);
+                        chain.removeLocation(city);
+                    }
+                    System.out.println("Removed city from chain, exiting program.");
+                    ArrayList<String> end = new ArrayList<>();
+                    store.clearCart(end); // clear the cart when exiting
+                    scanner.close();
+                    return;
+
+                case 19:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");
