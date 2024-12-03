@@ -13,7 +13,6 @@ public class GroceryStore {
         this.inventory = new ArrayList<>();
         loadInventory();
     }
-
     public GroceryStore(String city) {
         this.inventory = new ArrayList<>();
         fileName = "./" + city + "/inventory.txt";
@@ -26,7 +25,8 @@ public class GroceryStore {
         saveInventory();
     }
 
-    public void addItemQuantity(String date, int quantity, Item i) {
+    public void addItemQuantity(String date, int quantity, Item i)
+    {
         i.addQuantity(date, quantity);
         saveInventory();
     }
@@ -185,6 +185,7 @@ public class GroceryStore {
         return totalCost;
     }
 
+
     public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
@@ -262,8 +263,7 @@ public class GroceryStore {
                                                 eligibleQuantity, pricePerUnit, discount * 100, itemCost));
                                     } else if (availableQuantity > 0) {
                                         item.removeDate(availableQuantity);
-                                        itemCost = availableQuantity * discountedPrice
-                                                * (item.isTaxable() ? 1.07 : 1.0);
+                                        itemCost = availableQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
                                         totalCost += itemCost;
                                         receiptContent.append(String.format("%s\t%d\t$%.2f\t%.2f%%\t$%.2f\n", itemName,
                                                 availableQuantity, pricePerUnit, discount * 100, itemCost));
@@ -271,8 +271,7 @@ public class GroceryStore {
                                         System.out.println("Item " + itemName + " is out of stock.");
                                     }
                                 } else {
-                                    System.out
-                                            .println("Item " + itemName + " requires the customer to be 21 or older.");
+                                    System.out.println("Item " + itemName + " requires the customer to be 21 or older.");
                                 }
                             } else {
                                 System.out.println("Item " + itemName + " is not food stamp eligible.");
@@ -297,6 +296,9 @@ public class GroceryStore {
 
         return totalCost;
     }
+
+
+
 
     public void clearCart(ArrayList<String> itemsToRetain) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("cart.txt"))) {
@@ -421,12 +423,15 @@ public class GroceryStore {
         }
     }
 
-    public List<Item> removeFiles() {
+    public List<Item> removeFiles()
+    {
         File f = new File(BASE);
-        if (f.isDirectory()) {
+        if(f.isDirectory())
+        {
             File[] files = f.listFiles();
             assert files != null;
-            for (int i = files.length - 1; i >= 0; i--) {
+            for(int i = files.length - 1; i >= 0; i--)
+            {
                 files[i].delete();
             }
         }
