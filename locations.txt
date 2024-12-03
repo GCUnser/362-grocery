@@ -1,11 +1,4 @@
 Ames
-<<<<<<< HEAD
-Iowa City
 Des Moines
 New York City
-Miami
-=======
-Des Moines
-New York City
->>>>>>> origin/main
 Cedar Rapids
