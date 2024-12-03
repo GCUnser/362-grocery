@@ -106,10 +106,6 @@ public class Main {
             System.out.println("15. Put Item on Sale");
             System.out.println("16. Take Item off Sale");
             System.out.println("17. View Items on Sale");
-
-            System.out.println("18. Put Item on Sale");
-            System.out.println("16. Take Item off Sale");
-            System.out.println("17. View Items on Sale");
             System.out.println("18. Transfer Employees");
             System.out.println("19. Employees currently on the clock");
             System.out.println("20. Remove Store from Chain");
@@ -756,7 +752,7 @@ public class Main {
                     promotions.put("i5rhjoiwh", 49683946);
                     promotions.put("kbgmnlklrit", 58075789);
 
-                    System.out.println("Current promotions:");
+                    System.out.println("Current product promotions:");
 
                     for (String s : promotions.keySet()) {
                         System.out.println("\n" + s + ": " + promotions.get(s) + " weeks");
