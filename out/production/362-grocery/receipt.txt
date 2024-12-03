@@ -1,6 +1,12 @@
 Receipt:
 Item	Quantity	Unit Price	Discount	Total Price
+<<<<<<< HEAD
+cereal	1	$2.88	15.00%	$2.62
+
+Total Cost: $2.62
+=======
 beer	1	$8.99	3.00%	$9.33
 
 Total Cost: $9.33
+>>>>>>> origin/main
 Thank you for shopping with us!

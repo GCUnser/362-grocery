@@ -172,7 +172,9 @@ public class Main {
             System.out.println("18. Transfer Employees");
             System.out.println("19. Employees currently on the clock");
             System.out.println("20. Remove Store from Chain");
-            System.out.println("21. Exit");
+            System.out.println("21. Employee promotion");
+            System.out.println("22. View product promotions");
+            System.out.println("23. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -192,54 +194,6 @@ public class Main {
                             System.out.print("Enter item name: ");
                             name = scanner.nextLine();
                         }
-                    }
-                    for (Item i : chain.getInventory()){
-                        if (i.getName().compareTo(name.toLowerCase()) == 0) {
-                            System.out.println("Item exists in Chain Inventory");
-                            System.out.print("Enter item quantity to add: ");
-                            quantity = scanner.nextInt();
-                            while (quantity <= 0) {
-                                System.out.println(
-                                        "Invalid quantity to add, please add a positive amount of inventory");
-                                System.out.print("Enter item quantity to add: ");
-                                quantity = scanner.nextInt();
-                            }
-                            for (Item ib : store.getInventory()) {
-                                if (ib.getName().compareTo(name.toLowerCase()) == 0) {
-                                    if(quantity > i.getQuantity())
-                                    {
-                                        for(String date : i.getDateList())
-                                        {
-                                            ib.addQuantity(date, 1);
-                                            quantity--;
-                                        }
-                                        i.getDateList().clear();
-                                        if(i.getPrice() * quantity < chain.getMoney()){
-                                            System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
-                                            String date = scanner.next();
-                                            store.addItemQuantity(date, quantity, i);
-                                            chain.removeMoney(i.getPrice() * quantity);
-                                        }
-                                        else{
-                                            System.out.println("Not enough money in chain to add all requested quantity.");
-                                        }
-                                    }
-                                    else{
-                                        while(quantity > 0){
-                                            String date = i.getDateList().removeFirst();
-                                            ib.addQuantity(date, 1);
-                                            quantity--;
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                            correctName = false;
-                            break;
-                        }
-                    }
-                    if (!correctName) {
-                        break;
                     }
                     for (Item i : store.getInventory()) {
                         if (i.getName().compareTo(name.toLowerCase()) == 0) {
@@ -657,19 +611,19 @@ public class Main {
                 case 16:
                     System.out.print("Enter the item to take off sale: ");
                     name = scanner.nextLine();
-                    saleItems.removeSale(city,name);
+                    saleItems.removeSale(city, name);
                     break;
                 case 17:
                     saleItems.listSales(city);
                     break;
 
                 case 18:
-                    //Transfer employees to a new store
+                    // Transfer employees to a new store
 
                     HashMap<Integer, String> transferEmployees = new HashMap<>();
                     HashMap<Integer, String> storeBranch = new HashMap<>();
 
-// Load employee data from file
+                    // Load employee data from file
                     try (BufferedReader br = new BufferedReader(new FileReader("transferEmployees.txt"))) {
                         String line;
                         while ((line = br.readLine()) != null) {
@@ -685,7 +639,7 @@ public class Main {
                         return;
                     }
 
-// Load store branch data from file
+                    // Load store branch data from file
                     try (BufferedReader br = new BufferedReader(new FileReader("storeBranch.txt"))) {
                         String line;
                         while ((line = br.readLine()) != null) {
@@ -701,7 +655,7 @@ public class Main {
                         return;
                     }
 
-// Use the existing Scanner object for user input
+                    // Use the existing Scanner object for user input
                     try (FileWriter writer = new FileWriter("transferResults.txt")) {
                         for (int employeeId : transferEmployees.keySet()) {
                             String employeeName = transferEmployees.get(employeeId);
@@ -781,7 +735,7 @@ public class Main {
 
                     // Read the employeesWorking.txt file
                     try (BufferedReader br = new BufferedReader(new FileReader("employeesWorking.txt"));
-                         FileWriter writer = new FileWriter("employeesWorkingResult.txt")) {
+                            FileWriter writer = new FileWriter("employeesWorkingResult.txt")) {
 
                         String line;
                         while ((line = br.readLine()) != null) {
@@ -818,8 +772,7 @@ public class Main {
                 case 20:
                     List<Item> itemList;
                     itemList = store.removeFiles();
-                    for(Item toAdd: itemList)
-                    {
+                    for(Item toAdd : itemList) {
                         chain.addItemToStock(toAdd);
                         chain.removeLocation(city);
                     }
@@ -830,13 +783,49 @@ public class Main {
                     return;
 
                 case 21:
+                    System.out.println("Enter manager name");
+                    String managerName = scanner.nextLine();
+                    System.out.println("Enter manager ID");
+                    String managerID = scanner.nextLine();
+                    System.out.println("Enter employee name");
+                    String employeeName = scanner.nextLine();
+                    System.out.println("Enter employee ID");
+                    String employeeID = scanner.nextLine();
+                    System.out.println("Type \"confirm\" to approve promotion");
+
+                    if (scanner.next().equalsIgnoreCase("confirm")) {
+                        EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
+                                managerName);
+                        try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
+                            writer.write(promotion.toString());
+                            System.out.println("Promotion approved, results written to employee_promotions.txt");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.out.println("Promotion cancelled");
+                    }
+                    break;
+
+                case 22:
+                    HashMap<String, Integer> promotions = new HashMap<String, Integer>();
+                    promotions.put("wirhjoiwrhj", 92306709);
+                    promotions.put("i5rhjoiwh", 49683946);
+                    promotions.put("kbgmnlklrit", 58075789);
+
+                    System.out.println("Current product promotions:");
+
+                    for (String s : promotions.keySet()) {
+                        System.out.println("\n" + s + ": " + promotions.get(s) + " weeks");
+                    }
+                    break;
+
+                case 23:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
-
-
 
                 default:
                     System.out.println("Invalid choice, please try again.");

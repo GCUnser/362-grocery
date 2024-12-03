@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+beer,0.03,false
+apple cider,0.05,false
+cereal,0.15,true
+=======
 beer,0.03,false, N/A
 apple cider,0.05,false, N/A
 pear,0.02,true, 2
+>>>>>>> origin/main
