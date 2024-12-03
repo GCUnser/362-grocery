@@ -116,6 +116,57 @@ public class Chain {
         saveInventory();
     }
 
+    public List<Item> getInventory() {
+        return inventory;
+    }
+
+    public void addItem(Item item) {
+        inventory.add(item);
+        saveInventory();
+    }
+
+    public void addItemQuantity(String date, int quantity, Item i)
+    {
+        i.addQuantity(date, quantity);
+        saveInventory();
+    }
+
+    public double getMoney()
+    {
+        double currentProfit = 0.0;
+        try (BufferedReader reader = new BufferedReader(new FileReader("profit.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                currentProfit = Double.parseDouble(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error getting profit.txt: " + e.getMessage());
+        }
+        return currentProfit;
+    }
+
+    public void removeMoney(double amount)
+    {
+        try {
+            // Read the current profit value
+            double currentProfit = 0.0;
+            try (BufferedReader reader = new BufferedReader(new FileReader("profit.txt"))) {
+                String line = reader.readLine();
+                if (line != null) {
+                    currentProfit = Double.parseDouble(line);
+                }
+            }
+
+            // Update the profit
+            currentProfit = currentProfit - amount;
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("profit.txt"))) {
+                writer.write(String.format("%.2f", currentProfit));
+            }
+        } catch (IOException e) {
+            System.err.println("Error updating profit.txt: " + e.getMessage());
+        }
+    }
+
     /**
      * Checks if a location already exists in the locations file.
      *

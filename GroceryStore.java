@@ -57,8 +57,8 @@ public class GroceryStore {
 
     public int removeZeroItems() {
         int j = 0;
-        for (Item i : inventory) {
-            if (i.getQuantity() == 0) {
+        for (int i = inventory.size() - 1; i >= 0; i--) {
+            if (inventory.get(i).getQuantity() == 0) {
                 inventory.remove(i);
                 j++;
             }
