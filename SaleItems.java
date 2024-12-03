@@ -12,9 +12,17 @@ public class SaleItems {
      * @param cityName Name of the city where the sale is added.
      * @param itemName Name of the item on sale.
      * @param discount Discount rate (e.g., 0.1 for 10% off).
+<<<<<<< HEAD
      * @throws IOException if there are issues writing to the file.
      */
     public void addSale(String cityName, String itemName, double discount, boolean memberOnly) throws IOException {
+=======
+     * @param memberOnly is this discount for members onlu
+     * @param limit the max number of items a person can buy (N/A for no limit)
+     * @throws IOException if there are issues writing to the file.
+     */
+    public void addSale(String cityName, String itemName, double discount, boolean memberOnly, String limit) throws IOException {
+>>>>>>> origin/main
         if (discount <= 0 || discount >= 1) {
             System.out.println("Invalid discount value. It must be between 0 and 1.");
             return;
@@ -22,7 +30,11 @@ public class SaleItems {
 
         Path saleFilePath = Paths.get(cityName, "saleItems.txt");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(saleFilePath.toString(), true))) {
+<<<<<<< HEAD
             writer.write(itemName + "," + discount + "," + memberOnly);
+=======
+            writer.write(itemName + "," + discount + "," + memberOnly + "," + limit);
+>>>>>>> origin/main
             writer.newLine();
         }
         if(memberOnly) {

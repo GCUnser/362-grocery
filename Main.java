@@ -106,10 +106,16 @@ public class Main {
             System.out.println("15. Put Item on Sale");
             System.out.println("16. Take Item off Sale");
             System.out.println("17. View Items on Sale");
+
+            System.out.println("18. Put Item on Sale");
+            System.out.println("16. Take Item off Sale");
+            System.out.println("17. View Items on Sale");
+            System.out.println("18. Transfer Employees");
+            System.out.println("19. Employees currently on the clock");
+            System.out.println("20. Remove Store from Chain");
             System.out.println("21. Employee promotion");
             System.out.println("22. View product promotions");
-
-            System.out.println("18. Exit");
+            System.out.println("23. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -143,11 +149,7 @@ public class Main {
                             }
                             System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
                             String date = scanner.next();
-                            if (quantity == 1) {
-                                i.addQuantity(date);
-                            } else if (quantity > 1) {
-                                i.addQuantity(date, quantity);
-                            }
+                            store.addItemQuantity(date, quantity, i);
                             correctName = false;
                             break;
                         }
@@ -163,25 +165,13 @@ public class Main {
                     double price = scanner.nextDouble();
                     System.out.print("Enter if item is Taxable (y or n): ");
                     boolean taxable;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        taxable = true;
-                    } else {
-                        taxable = false;
-                    }
+                    taxable = scanner.next().equalsIgnoreCase("y");
                     System.out.print("Enter if item is applicable for Food Stamps (y or n): ");
                     boolean foodStamp;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        foodStamp = true;
-                    } else {
-                        foodStamp = false;
-                    }
+                    foodStamp = scanner.next().equalsIgnoreCase("y");
                     System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
                     boolean twentyOnePlus;
-                    if (scanner.next().equalsIgnoreCase("y")) {
-                        twentyOnePlus = true;
-                    } else {
-                        twentyOnePlus = false;
-                    }
+                    twentyOnePlus = scanner.next().equalsIgnoreCase("y");
                     scanner.nextLine(); // Consume newline
 
                     Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
@@ -537,10 +527,18 @@ public class Main {
                     scanner.nextLine();
                     System.out.print("Is this discount members only? (y/n): ");
                     String yOrN = scanner.nextLine();
+                    System.out.print("Is there a limit on how many items the customer can buy on sale? (y/n): ");
+                    String limitExists = scanner.nextLine();
+                    String limit = "N/A";
+                    if (limitExists.equalsIgnoreCase("y")) {
+                        System.out.print("Enter the limit: ");
+                        limit = scanner.next();
+                        scanner.nextLine();
+                    }
                     if (yOrN.equalsIgnoreCase("y")) {
-                        saleItems.addSale(city, name, discount, true);
+                        saleItems.addSale(city, name, discount, true, limit);
                     } else {
-                        saleItems.addSale(city, name, discount, false);
+                        saleItems.addSale(city, name, discount, false, limit);
                     }
                     break;
 
@@ -552,13 +550,184 @@ public class Main {
                 case 17:
                     saleItems.listSales(city);
                     break;
+
                 case 18:
+                    // Transfer employees to a new store
+
+                    HashMap<Integer, String> transferEmployees = new HashMap<>();
+                    HashMap<Integer, String> storeBranch = new HashMap<>();
+
+                    // Load employee data from file
+                    try (BufferedReader br = new BufferedReader(new FileReader("transferEmployees.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                String[] parts = line.split(", ");
+                                int id = Integer.parseInt(parts[0].trim());
+                                String employeeName = parts[1].replace("\"", "").trim();
+                                transferEmployees.put(id, employeeName);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    // Load store branch data from file
+                    try (BufferedReader br = new BufferedReader(new FileReader("storeBranch.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                String[] parts = line.split(", ");
+                                int id = Integer.parseInt(parts[0].trim());
+                                String branch = parts[1].replace("\"", "").trim();
+                                storeBranch.put(id, branch);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    // Use the existing Scanner object for user input
+                    try (FileWriter writer = new FileWriter("transferResults.txt")) {
+                        for (int employeeId : transferEmployees.keySet()) {
+                            String employeeName = transferEmployees.get(employeeId);
+
+                            // Ask if the employee wants to transfer
+                            String response = null;
+                            while (true) {
+                                System.out.println(
+                                        "Would " + employeeName + " like to transfer to a new store? (yes/no)");
+
+                                // Use the existing scanner object for input
+                                if (scanner.hasNextLine()) {
+                                    response = scanner.nextLine().trim().toLowerCase();
+                                    if (response.equals("yes") || response.equals("no")) {
+                                        break; // Valid response, break out of the loop
+                                    } else {
+                                        System.out.println("Invalid response. Please type 'yes' or 'no'.");
+                                    }
+                                } else {
+                                    System.out.println("No input detected. Skipping employee " + employeeName + ".");
+                                    return; // Exit the loop or program if no input
+                                }
+                            }
+
+                            if (response.equals("yes")) {
+                                // Show available store branches
+                                System.out.println("Available store branches:");
+                                for (int branchId : storeBranch.keySet()) {
+                                    System.out.println(branchId + ". " + storeBranch.get(branchId));
+                                }
+
+                                // Prompt for branch ID
+                                int chosenBranchId = -1;
+                                while (true) {
+                                    System.out.println("Enter the ID of the store branch " + employeeName
+                                            + " wants to transfer to:");
+
+                                    // Validate user input for store branch ID
+                                    if (scanner.hasNextLine()) {
+                                        String input = scanner.nextLine().trim();
+                                        try {
+                                            chosenBranchId = Integer.parseInt(input);
+                                            if (storeBranch.containsKey(chosenBranchId)) {
+                                                break; // Valid branch ID
+                                            } else {
+                                                System.out.println("Invalid branch ID. Please try again.");
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            System.out.println("Invalid input. Please enter a valid number.");
+                                        }
+                                    } else {
+                                        System.out.println("No input detected for branch ID. Skipping.");
+                                        return; // Exit if no input is detected
+                                    }
+                                }
+
+                                String chosenBranch = storeBranch.get(chosenBranchId);
+                                writer.write(
+                                        employeeName + " will transfer to " + chosenBranch + System.lineSeparator());
+                                System.out.println(employeeName + " will transfer to " + chosenBranch + ".");
+                            } else {
+                                writer.write(
+                                        employeeName + " will not transfer to a new store." + System.lineSeparator());
+                            }
+                        }
+
+                        System.out.println("Transfer decisions have been recorded in transferResults.txt.");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    break;
+
+                case 19:
+
+                    HashMap<Integer, String> employeesWorking = new HashMap<>();
+                    int empCount = 0;
+
+                    // Read the employeesWorking.txt file
+                    try (BufferedReader br = new BufferedReader(new FileReader("employeesWorking.txt"));
+                            FileWriter writer = new FileWriter("employeesWorkingResult.txt")) {
+
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (!line.isEmpty()) {
+                                // Split the line into parts
+                                String[] parts = line.split(", ");
+                                int id = Integer.parseInt(parts[0].trim());
+                                String empName = parts[1].replace("\"", "").trim();
+                                String workingStatus = parts[2].replace("\"", "").trim();
+
+                                // Add employee to the HashMap
+                                employeesWorking.put(id, empName);
+
+                                // Write the employee's status to the file
+                                writer.write(empName + " is "
+                                        + (workingStatus.equalsIgnoreCase("Yes") ? "currently on the clock."
+                                                : "not on the clock.")
+                                        + "\n");
+
+                                // Increase empCount if workingStatus is "Yes"
+                                if (workingStatus.equalsIgnoreCase("Yes")) {
+                                    empCount++;
+                                }
+                            }
+                        }
+
+                        // Write the total number of employees on the clock
+                        writer.write("Total employees on the clock: " + empCount + "\n");
+                        System.out.println("Output written to employeesWorkingResult.txt.");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    break;
+
+                case 20:
+                    List<Item> itemList;
+                    itemList = store.removeFiles();
+                    for (Item toAdd : itemList) {
+                        chain.addItemToStock(toAdd);
+                        chain.removeLocation(city);
+                    }
+                    System.out.println("Removed city from chain, exiting program.");
+                    ArrayList<String> end = new ArrayList<>();
+                    store.clearCart(end); // clear the cart when exiting
+                    scanner.close();
+                    return;
+
+                case 21:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
-                case 21:
+                case 22:
                     System.out.println("Enter manager name");
                     String managerName = scanner.nextLine();
                     System.out.println("Enter manager ID");
@@ -581,7 +750,7 @@ public class Main {
                     } else {
                         System.out.println("Promotion cancelled");
                     }
-                case 22:
+                case 23:
                     HashMap<String, Integer> promotions = new HashMap<String, Integer>();
                     promotions.put("wirhjoiwrhj", 92306709);
                     promotions.put("i5rhjoiwh", 49683946);

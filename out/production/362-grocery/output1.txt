@@ -1,2 +1,2 @@
-Violation: Racism
-Action: Warning for Chase
+Violation: absent for work more than 3 times without manager approval
+Action: Fired Lauren

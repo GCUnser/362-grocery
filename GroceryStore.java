@@ -5,7 +5,11 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class GroceryStore {
+<<<<<<< HEAD
     private static String FILE_NAME = "inventory.txt";
+=======
+    private String fileName;
+>>>>>>> origin/main
     private static String BASE = "";
     private List<Item> inventory;
 
@@ -15,13 +19,23 @@ public class GroceryStore {
     }
     public GroceryStore(String city) {
         this.inventory = new ArrayList<>();
+<<<<<<< HEAD
         FILE_NAME = "./" + city + "/inventory.txt";
+=======
+        fileName = "./" + city + "/inventory.txt";
+>>>>>>> origin/main
         BASE = "./" + city;
         loadInventory();
     }
 
     public void addItem(Item item) {
         inventory.add(item);
+        saveInventory();
+    }
+
+    public void addItemQuantity(String date, int quantity, Item i)
+    {
+        i.addQuantity(date, quantity);
         saveInventory();
     }
 
@@ -101,20 +115,38 @@ public class GroceryStore {
         double totalCost = 0.0;
         Map<String, Double> allSaleItems = new HashMap<>();
         Map<String, Double> nonMemberSaleItems = new HashMap<>();
+<<<<<<< HEAD
 
         // Load sales from saleItems.txt if it exists
         Path saleFilePath = Paths.get(BASE + "/saleItems.txt");
+=======
+        Map<String, Integer> saleLimits = new HashMap<>();
+
+        // Load sales from saleItems.txt for the specified city
+        Path saleFilePath = Paths.get(BASE, "saleItems.txt");
+>>>>>>> origin/main
         if (Files.exists(saleFilePath)) {
             try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
                 String line;
                 while ((line = saleReader.readLine()) != null) {
                     String[] parts = line.split(",\\s*");
+<<<<<<< HEAD
                     if (parts.length == 3) {
                         String itemName = parts[0].trim().toLowerCase();
                         double discount = Double.parseDouble(parts[1]);
                         boolean isMemberOnly = parts[2].equalsIgnoreCase("true");
 
                         allSaleItems.put(itemName, discount);
+=======
+                    if (parts.length >= 4) {
+                        String itemName = parts[0].trim().toLowerCase();
+                        double discount = Double.parseDouble(parts[1]);
+                        boolean isMemberOnly = Boolean.parseBoolean(parts[2]);
+                        int limit = parts[3].equalsIgnoreCase("N/A") ? Integer.MAX_VALUE : Integer.parseInt(parts[3]);
+
+                        allSaleItems.put(itemName, discount);
+                        saleLimits.put(itemName, limit);
+>>>>>>> origin/main
                         if (!isMemberOnly) {
                             nonMemberSaleItems.put(itemName, discount);
                         }
@@ -125,20 +157,32 @@ public class GroceryStore {
             }
         }
 
+<<<<<<< HEAD
         // Calculate cart cost considering sales
+=======
+        // Calculate cart cost considering sales and limits
+>>>>>>> origin/main
         try (BufferedReader reader = new BufferedReader(new FileReader("cart.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",\\s*");
                 if (parts.length == 2) {
                     String itemName = parts[0];
-                    int quantity = Integer.parseInt(parts[1]);
+                    int requestedQuantity;
+
+                    try {
+                        requestedQuantity = Integer.parseInt(parts[1]);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid quantity in cart.txt for item: " + itemName);
+                        continue;
+                    }
 
                     // Find the item in inventory
                     Item item = findItemInInventory(itemName);
                     if (item != null) {
                         double pricePerUnit = item.getPrice();
 
+<<<<<<< HEAD
                         // Apply discount based on membership
                         double discount = member
                                 ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
@@ -148,7 +192,26 @@ public class GroceryStore {
 
                         // Apply tax if the item is taxable
                         double itemCost = quantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
+=======
+                        // Determine discount and limit
+                        double discount = member
+                                ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
+                                : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
+                        int limit = saleLimits.getOrDefault(itemName.toLowerCase(), Integer.MAX_VALUE);
+
+                        // Adjust quantity based on limit
+                        int eligibleQuantity = Math.min(requestedQuantity, limit);
+
+                        double discountedPrice = pricePerUnit * (1 - discount);
+                        double itemCost = eligibleQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
+
+>>>>>>> origin/main
                         totalCost += itemCost;
+
+                        // Inform if remaining quantity exceeded limit
+                        if (requestedQuantity > limit) {
+                            System.out.println("Note: Sale limit of " + limit + " applied to " + itemName + ".");
+                        }
                     } else {
                         System.out.println("Item not found in inventory: " + itemName);
                     }
@@ -162,13 +225,16 @@ public class GroceryStore {
     }
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
     public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
-        StringBuilder recordsContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
         receiptContent.append("Item\tQuantity\tUnit Price\tDiscount\tTotal Price\n");
+<<<<<<< HEAD
         recordsContent.append("Item\tQuantity\tUnit Price\tDiscount\tTotal Price\n");
         ArrayList<String> itemsToRetainInCart = new ArrayList<>();
         Map<String, Double> allSaleItems = new HashMap<>();
@@ -176,17 +242,37 @@ public class GroceryStore {
 
         // Load sales if the file exists
         Path saleFilePath = Paths.get(BASE + "/saleItems.txt");
+=======
+        ArrayList<String> itemsToRetainInCart = new ArrayList<>();
+        Map<String, Double> allSaleItems = new HashMap<>();
+        Map<String, Double> nonMemberSaleItems = new HashMap<>();
+        Map<String, Integer> saleLimits = new HashMap<>();
+
+        // Load sales for the specified city
+        Path saleFilePath = Paths.get(BASE, "saleItems.txt");
+>>>>>>> origin/main
         if (Files.exists(saleFilePath)) {
             try (BufferedReader saleReader = new BufferedReader(new FileReader(saleFilePath.toString()))) {
                 String line;
                 while ((line = saleReader.readLine()) != null) {
                     String[] parts = line.split(",\\s*");
+<<<<<<< HEAD
                     if (parts.length == 3) {
                         String itemName = parts[0].trim().toLowerCase();
                         double discount = Double.parseDouble(parts[1]);
                         boolean isMemberOnly = parts[2].equalsIgnoreCase("true");
 
                         allSaleItems.put(itemName, discount);
+=======
+                    if (parts.length >= 4) {
+                        String itemName = parts[0].trim().toLowerCase();
+                        double discount = Double.parseDouble(parts[1]);
+                        boolean isMemberOnly = Boolean.parseBoolean(parts[2]);
+                        int limit = parts[3].equalsIgnoreCase("N/A") ? Integer.MAX_VALUE : Integer.parseInt(parts[3]);
+
+                        allSaleItems.put(itemName, discount);
+                        saleLimits.put(itemName, limit);
+>>>>>>> origin/main
                         if (!isMemberOnly) {
                             nonMemberSaleItems.put(itemName, discount);
                         }
@@ -217,22 +303,42 @@ public class GroceryStore {
                             int availableQuantity = item.getQuantity();
                             double pricePerUnit = item.getPrice();
 
+<<<<<<< HEAD
                             // Determine discount
                             double discount = member
                                     ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
                                     : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
+=======
+                            // Determine discount and limit
+                            double discount = member
+                                    ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
+                                    : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
+                            int limit = saleLimits.getOrDefault(itemName.toLowerCase(), Integer.MAX_VALUE);
+
+                            // Adjust quantity based on limit
+                            int eligibleQuantity = Math.min(requestedQuantity, limit);
+>>>>>>> origin/main
 
                             double discountedPrice = pricePerUnit * (1 - discount);
                             double itemCost = 0.0;
 
                             if (payment != 4 || item.isFoodStampEligible()) {
                                 if (twentyonePlus || !item.forTwentyOnePlus()) {
+<<<<<<< HEAD
                                     if (availableQuantity >= requestedQuantity) {
                                         item.removeDate(requestedQuantity);
                                         itemCost = requestedQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
                                         totalCost += itemCost;
                                         receiptContent.append(String.format("%s\t%d\t$%.2f\t%.2f%%\t$%.2f\n", itemName,
                                                 requestedQuantity, pricePerUnit, discount * 100, itemCost));
+=======
+                                    if (availableQuantity >= eligibleQuantity) {
+                                        item.removeDate(eligibleQuantity);
+                                        itemCost = eligibleQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
+                                        totalCost += itemCost;
+                                        receiptContent.append(String.format("%s\t%d\t$%.2f\t%.2f%%\t$%.2f\n", itemName,
+                                                eligibleQuantity, pricePerUnit, discount * 100, itemCost));
+>>>>>>> origin/main
                                     } else if (availableQuantity > 0) {
                                         item.removeDate(availableQuantity);
                                         itemCost = availableQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
@@ -265,13 +371,20 @@ public class GroceryStore {
         saveInventory();
         clearCart(itemsToRetainInCart);
         generateReceipt(receiptContent.toString(), totalCost);
+<<<<<<< HEAD
         generateSalesRecord(recordsContent.toString(), totalCost);
+=======
+>>>>>>> origin/main
 
         return totalCost;
     }
 
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
     public void clearCart(ArrayList<String> itemsToRetain) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("cart.txt"))) {
             for (String itemLine : itemsToRetain) {
@@ -395,6 +508,22 @@ public class GroceryStore {
         }
     }
 
+    public List<Item> removeFiles()
+    {
+        File f = new File(BASE);
+        if(f.isDirectory())
+        {
+            File[] files = f.listFiles();
+            assert files != null;
+            for(int i = files.length - 1; i >= 0; i--)
+            {
+                files[i].delete();
+            }
+        }
+        f.delete();
+        return inventory;
+    }
+
     private void updateReceiptFile(String updatedReceiptContent) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("receipt.txt"))) {
             writer.write(updatedReceiptContent);
@@ -478,7 +607,7 @@ public class GroceryStore {
     }
 
     private void loadInventory() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 inventory.add(Item.fromString(line));
@@ -489,7 +618,7 @@ public class GroceryStore {
     }
 
     private void saveInventory() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Item item : inventory) {
                 writer.write(item.toString());
                 writer.newLine();

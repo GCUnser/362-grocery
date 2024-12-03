@@ -1,11 +1,25 @@
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
+<<<<<<< HEAD
+=======
+import java.util.List;
+>>>>>>> origin/main
 import java.util.Scanner;
 
 public class Chain {
 
     private static final String LOCATIONS_FILE = "locations.txt";
+<<<<<<< HEAD
+=======
+    private static final String INVENTORY_FILE = "chainInventory.txt";
+    private static final List<Item> inventory = new ArrayList<>();
+
+    public Chain()
+    {
+        loadInventory();
+    }
+>>>>>>> origin/main
 
     /**
      * Adds a new location to the chain by updating the locations file and creating a new inventory folder.
@@ -48,6 +62,69 @@ public class Chain {
         return true;
     }
 
+<<<<<<< HEAD
+=======
+    public void removeLocation(String locationName) throws IOException
+    {
+        if(locationExists(locationName))
+        {
+            ArrayList<String> names = new ArrayList<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader(LOCATIONS_FILE))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if(!line.trim().equalsIgnoreCase(locationName.trim()))
+                    {
+                        names.add(line);
+                    }
+
+                }
+            }
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOCATIONS_FILE))) {
+                for(int i = 0; i < names.size(); i++)
+                {
+                    writer.write(names.get(i));
+                    writer.newLine();
+                }
+            }
+        }
+        System.out.printf("Removed location with name %s\n", locationName);
+
+    }
+
+    public void addItemToStock(Item toAdd)
+    {
+        for(Item i: inventory)
+        {
+            if(i.getName().equalsIgnoreCase(toAdd.getName()))
+            {
+                String date = "";
+                int k = 0;
+                for(int j = 0; j < toAdd.getQuantity(); j++)
+                {
+                    if(date.equals(toAdd.getDateList().get(j)))
+                    {
+                        k++;
+                    }
+                    else if(!date.isEmpty() && !date.equals(toAdd.getDateList().get(j)))
+                    {
+                        i.addQuantity(date, k);
+                        date = toAdd.getDateList().get(j);
+                        k++;
+                    }
+                    else
+                    {
+                        date = toAdd.getDateList().get(j);
+                        k = 1;
+                    }
+                }
+
+            }
+            break;
+        }
+        saveInventory();
+    }
+
+>>>>>>> origin/main
     /**
      * Checks if a location already exists in the locations file.
      *
@@ -143,4 +220,29 @@ public class Chain {
             }
         }
     }
+<<<<<<< HEAD
+=======
+
+    private void loadInventory() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(INVENTORY_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                inventory.add(Item.fromString(line));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading inventory: " + e.getMessage());
+        }
+    }
+
+    private void saveInventory() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(INVENTORY_FILE))) {
+            for (Item item : inventory) {
+                writer.write(item.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving inventory: " + e.getMessage());
+        }
+    }
+>>>>>>> origin/main
 }
