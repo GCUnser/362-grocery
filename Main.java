@@ -44,8 +44,9 @@ public class Main {
         while (!valid) {
             System.out.println("Choose an option:");
             System.out.println("1. Add a new store location");
+            System.out.println("2. Add an item to Chain Inventory");
             for (int i = 0; i < locations.size(); i++) {
-                System.out.println((i + 2) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new store"
+                System.out.println((i + 3) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new store"
             }
             System.out.print("Enter the number of your choice: ");
             String input = scanner.nextLine();
@@ -65,8 +66,72 @@ public class Main {
                     } catch (IOException e) {
                         System.out.println("Error while adding new location: " + e.getMessage());
                     }
-                } else if (choice >= 2 && choice <= locations.size() + 1) {
-                    city = locations.get(choice - 2); // Offset by 2 since option 1 is "Add a new store"
+                } else if (choice == 2) {
+                    boolean correctName = false;
+                    System.out.print("Enter item name: ");
+                    name = scanner.nextLine();
+                    while (!correctName) {
+                        System.out.println("Is this the correct name of the product you wish to add: " + name);
+                        System.out.print("Please answer y or n: ");
+                        String answer = scanner.next();
+                        if (answer.equalsIgnoreCase("y")) {
+                            correctName = true;
+                        } else {
+                            System.out.print("Enter item name: ");
+                            name = scanner.nextLine();
+                        }
+                    }
+                    for (Item i : chain.getInventory()) {
+                        if (i.getName().compareTo(name.toLowerCase()) == 0) {
+                            System.out.println("Item exists in Inventory");
+                            System.out.print("Enter item quantity to add: ");
+                            quantity = scanner.nextInt();
+                            if(i.getPrice() * quantity > chain.getMoney())
+                            {
+                                System.out.println("Not enough money to purchase requested quantity");
+                                correctName = false;
+                                break;
+                            }
+                            while (quantity <= 0) {
+                                System.out.println(
+                                        "Invalid quantity to add, please pick add a positive amount of inventory");
+                                System.out.print("Enter item quantity to add: ");
+                                quantity = scanner.nextInt();
+                            }
+                            System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
+                            String date = scanner.next();
+                            chain.addItemQuantity(date, quantity, i);
+                            chain.removeMoney(i.getPrice() * quantity);
+                            correctName = false;
+                            break;
+                        }
+                    }
+                    if (correctName) {
+                        System.out.println("No item exists by that name, please enter it into the Inventory");
+                        scanner.nextLine();
+                        System.out.print("Enter item category: ");
+                        category = scanner.nextLine();
+                        System.out.print("Enter item price: ");
+                        double price = scanner.nextDouble();
+                        System.out.print("Enter if item is Taxable (y or n): ");
+                        boolean taxable;
+                        taxable = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item is applicable for Food Stamps (y or n): ");
+                        boolean foodStamp;
+                        foodStamp = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
+                        boolean twentyOnePlus;
+                        twentyOnePlus = scanner.next().equalsIgnoreCase("y");
+                        scanner.nextLine(); // Consume newline
+
+                        Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
+                                twentyOnePlus);
+                        chain.addItem(item);
+                        System.out.println("Item added successfully!\n");
+                    }
+                }
+                else if (choice >= 3 && choice <= locations.size() + 2) {
+                    city = locations.get(choice - 3); // Offset by 2 since option 1 is "Add a new store"
                     System.out.println("You selected: " + city);
                     valid = true;
                 } else {
@@ -128,6 +193,54 @@ public class Main {
                             name = scanner.nextLine();
                         }
                     }
+                    for (Item i : chain.getInventory()){
+                        if (i.getName().compareTo(name.toLowerCase()) == 0) {
+                            System.out.println("Item exists in Chain Inventory");
+                            System.out.print("Enter item quantity to add: ");
+                            quantity = scanner.nextInt();
+                            while (quantity <= 0) {
+                                System.out.println(
+                                        "Invalid quantity to add, please add a positive amount of inventory");
+                                System.out.print("Enter item quantity to add: ");
+                                quantity = scanner.nextInt();
+                            }
+                            for (Item ib : store.getInventory()) {
+                                if (ib.getName().compareTo(name.toLowerCase()) == 0) {
+                                    if(quantity > i.getQuantity())
+                                    {
+                                        for(String date : i.getDateList())
+                                        {
+                                            ib.addQuantity(date, 1);
+                                            quantity--;
+                                        }
+                                        i.getDateList().clear();
+                                        if(i.getPrice() * quantity < chain.getMoney()){
+                                            System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
+                                            String date = scanner.next();
+                                            store.addItemQuantity(date, quantity, i);
+                                            chain.removeMoney(i.getPrice() * quantity);
+                                        }
+                                        else{
+                                            System.out.println("Not enough money in chain to add all requested quantity.");
+                                        }
+                                    }
+                                    else{
+                                        while(quantity > 0){
+                                            String date = i.getDateList().removeFirst();
+                                            ib.addQuantity(date, 1);
+                                            quantity--;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                            correctName = false;
+                            break;
+                        }
+                    }
+                    if (!correctName) {
+                        break;
+                    }
                     for (Item i : store.getInventory()) {
                         if (i.getName().compareTo(name.toLowerCase()) == 0) {
                             System.out.println("Item exists in Inventory");
@@ -135,13 +248,19 @@ public class Main {
                             quantity = scanner.nextInt();
                             while (quantity <= 0) {
                                 System.out.println(
-                                        "Invalid quantity to add, please pick add a positive amount of inventory");
+                                        "Invalid quantity to add, please add a positive amount of inventory");
                                 System.out.print("Enter item quantity to add: ");
                                 quantity = scanner.nextInt();
                             }
-                            System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
-                            String date = scanner.next();
-                            store.addItemQuantity(date, quantity, i);
+                            if(i.getPrice() * quantity < chain.getMoney()){
+                                System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
+                                String date = scanner.next();
+                                store.addItemQuantity(date, quantity, i);
+                                chain.removeMoney(i.getPrice() * quantity);
+                            }
+                            else{
+                                System.out.println("Not enough money in chain to add all requested quantity.");
+                            }
                             correctName = false;
                             break;
                         }
