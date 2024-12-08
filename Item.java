@@ -8,7 +8,6 @@ public class Item implements Serializable {
     private String name;
     private String category;
     private double price;
-    private int quantity;
     private ArrayList<String> date; //sorted from smallest date (next to expire) to largest date (furthest from expiration)
 
     public Item(String name, String category, double price, boolean taxable, boolean foodStamp, boolean tOPlus) {
@@ -18,7 +17,6 @@ public class Item implements Serializable {
         this.taxable = taxable;
         this.foodStamp = foodStamp;
         twentyOnePlus = tOPlus;
-        this.quantity = 0;
         this.date = new ArrayList<>(); // Initialize date list
     }
 
@@ -29,12 +27,10 @@ public class Item implements Serializable {
         this.taxable = taxable;
         this.foodStamp = foodStamp;
         twentyOnePlus = tOPlus;
-        this.quantity = quantity;
         this.date = new ArrayList<>(date);
     }
 
     public void addQuantity(String date, int quantity) {
-        this.quantity += quantity;
         for(int j = 0; j <= this.date.size(); j++)
         {
             if(j == this.date.size())
@@ -58,9 +54,8 @@ public class Item implements Serializable {
     public void removeDate(int toRemove)
     {
         for(int i = 0; i < toRemove; i++) {
-            if (quantity > 0) {
+            if (!date.isEmpty()) {
                 date.removeFirst();
-                quantity--;
             }
         }
     }
@@ -78,7 +73,7 @@ public class Item implements Serializable {
     }
 
     public int getQuantity() {
-        return quantity;
+        return date.size();
     }
 
     public boolean isTaxable() {
@@ -99,7 +94,7 @@ public class Item implements Serializable {
 
     @Override
     public String toString() {
-        return name + "," + category + "," + String.format("%.2f", price) + "," + quantity + "," + taxable + "," + foodStamp + "," + twentyOnePlus + "," + String.join(",", date);
+        return name + "," + category + "," + String.format("%.2f", price) + "," + date.size() + "," + taxable + "," + foodStamp + "," + twentyOnePlus + "," + String.join(",", date);
     }
 
     public static Item fromString(String line) {
