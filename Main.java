@@ -172,7 +172,11 @@ public class Main {
             System.out.println("18. Transfer Employees");
             System.out.println("19. Employees currently on the clock");
             System.out.println("20. Remove Store from Chain");
-            System.out.println("21. Exit");
+            System.out.println("21. Join Loyalty Program");
+            System.out.println("22. View Membership");
+            System.out.println("23. Upgrade Membership");
+            System.out.println("24. Delete Membership");
+            System.out.println("25. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -357,16 +361,16 @@ public class Main {
                     break;
 
                 case 6:
-                    // System.out.print("Enter item name to buy: ");
-                    // String itemName = scanner.nextLine();
-                    // System.out.print("Enter quantity to buy: ");
-                    // int requestedQuantity = scanner.nextInt();
-                    // scanner.nextLine(); // Consume newline
                     int payChoice = 0;
                     boolean validChoice = false;
                     boolean twentyonePlus = false;
                     boolean member = false;
+                    String filename = "";
+                    int userPoints = 0;
+                    boolean usePoints = false;
+                    boolean premium = false;
 
+                    // Payment option selection
                     while (!validChoice) {
                         System.out.println("1. Card");
                         System.out.println("2. Gift Card");
@@ -382,29 +386,78 @@ public class Main {
                             System.out.println("Invalid choice, please try again.");
                         }
                     }
+
+                    // Check if customer is 21 or older
                     System.out.print("Are you 21 or older? (y/n): ");
                     if (scanner.next().equalsIgnoreCase("y")) {
                         twentyonePlus = true;
                     }
                     scanner.nextLine();
+
+                    // Check if customer is a member
                     System.out.print("Are you a member? (y/n): ");
                     if (scanner.next().equalsIgnoreCase("y")) {
-                        member = true;
+                        scanner.nextLine();
+                        System.out.print("Enter your contact info: ");
+                        String contactInfo = scanner.nextLine();
+                        filename = contactInfo.replaceAll("[^a-zA-Z0-9]", "_") + ".txt"; // Sanitize filename
+
+                        // Check if the file exists
+                        File file = new File(filename);
+                        if (file.exists()) {
+                            System.out.println("We located your membership!");
+                            member = true;
+
+                            // Read points from the file
+                            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    if(line.startsWith("Subscription Type: Premium")) {
+                                        premium = true;
+                                    }
+                                    if (line.startsWith("Points: ")) {
+                                        userPoints = Integer.parseInt(line.replace("Points: ", "").trim());
+                                        break;
+                                    }
+
+                                }
+                            } catch (IOException | NumberFormatException e) {
+                                System.err.println("Error reading membership file: " + e.getMessage());
+                            }
+
+                            // Ask if they want to redeem points if they have 100 or more
+                            if (userPoints >= 100) {
+                                System.out.println("You have " + userPoints + " points. Would you like to redeem 100 points for a $5 discount? (y/n): ");
+                                if (scanner.next().equalsIgnoreCase("y")) {
+                                    usePoints = true;
+                                    userPoints -= 100; // Deduct 100 points for redemption
+                                }
+                                scanner.nextLine();
+                            }
+                        } else {
+                            System.out.println("No existing membership found.");
+                        }
                     }
-                    scanner.nextLine();
+
+                    // Get the user's available money
                     System.out.print("Enter the amount you have: $");
                     double userMoney = scanner.nextDouble();
                     scanner.nextLine(); // Consume newline
 
+                    // Calculate the initial total cost
                     double totalCost = store.calculateCartCost(member);
 
+                    // Adjust cart if the user doesn't have enough money
                     while (totalCost > userMoney) {
                         System.out.println("You don't have enough money. Let's review your cart.");
                         cart.reviewAndRemoveItems(store, cart, totalCost, userMoney, scanner);
                         totalCost = store.calculateCartCost(member);
                     }
-                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member);
+
+                    // Checkout process
+                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member, filename, usePoints, premium);
                     break;
+
                 case 7:
                     System.out.print("Enter the item name you want to return: ");
                     name = scanner.nextLine();
@@ -830,6 +883,25 @@ public class Main {
                     return;
 
                 case 21:
+                    LoyaltyProgram.addCustomerToLoyaltyProgram();
+                    break;
+                case 22:
+                    // Prompt the user to enter their contact info
+                    System.out.print("Enter your contact info: ");
+                    String contactInfo = scanner.nextLine().trim();
+                    String file = contactInfo.replaceAll("[^a-zA-Z0-9]", "_") + ".txt";
+
+                    // View membership details
+                    LoyaltyProgram.viewMembership(file);
+                    break;
+
+                case 23:
+                    LoyaltyProgram.upgradeMembership();
+                    break;
+                case 24:
+                    LoyaltyProgram.deleteMembership();
+                    break;
+                case 25:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");
