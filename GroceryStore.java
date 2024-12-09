@@ -13,7 +13,6 @@ public class GroceryStore {
         this.inventory = new ArrayList<>();
         loadInventory();
     }
-
     public GroceryStore(String city) {
         this.inventory = new ArrayList<>();
         fileName = "./" + city + "/inventory.txt";
@@ -26,7 +25,8 @@ public class GroceryStore {
         saveInventory();
     }
 
-    public void addItemQuantity(String date, int quantity, Item i) {
+    public void addItemQuantity(String date, int quantity, Item i)
+    {
         i.addQuantity(date, quantity);
         saveInventory();
     }
@@ -185,7 +185,8 @@ public class GroceryStore {
         return totalCost;
     }
 
-    public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member) {
+
+    public double checkout(int payment, double userMoney, boolean twentyonePlus, boolean member, String filename, boolean usePoints, boolean premium) {
         double totalCost = 0.0;
         StringBuilder receiptContent = new StringBuilder();
         receiptContent.append("Receipt:\n");
@@ -241,7 +242,7 @@ public class GroceryStore {
                             double pricePerUnit = item.getPrice();
 
                             // Determine discount and limit
-                            double discount = member
+                            double discount = premium
                                     ? allSaleItems.getOrDefault(itemName.toLowerCase(), 0.0)
                                     : nonMemberSaleItems.getOrDefault(itemName.toLowerCase(), 0.0);
                             int limit = saleLimits.getOrDefault(itemName.toLowerCase(), Integer.MAX_VALUE);
@@ -262,8 +263,7 @@ public class GroceryStore {
                                                 eligibleQuantity, pricePerUnit, discount * 100, itemCost));
                                     } else if (availableQuantity > 0) {
                                         item.removeDate(availableQuantity);
-                                        itemCost = availableQuantity * discountedPrice
-                                                * (item.isTaxable() ? 1.07 : 1.0);
+                                        itemCost = availableQuantity * discountedPrice * (item.isTaxable() ? 1.07 : 1.0);
                                         totalCost += itemCost;
                                         receiptContent.append(String.format("%s\t%d\t$%.2f\t%.2f%%\t$%.2f\n", itemName,
                                                 availableQuantity, pricePerUnit, discount * 100, itemCost));
@@ -271,8 +271,7 @@ public class GroceryStore {
                                         System.out.println("Item " + itemName + " is out of stock.");
                                     }
                                 } else {
-                                    System.out
-                                            .println("Item " + itemName + " requires the customer to be 21 or older.");
+                                    System.out.println("Item " + itemName + " requires the customer to be 21 or older.");
                                 }
                             } else {
                                 System.out.println("Item " + itemName + " is not food stamp eligible.");
@@ -287,6 +286,58 @@ public class GroceryStore {
             System.err.println("Error reading cart.txt: " + e.getMessage());
         }
 
+        // Handle points if a membership file exists
+        if (!filename.isEmpty()) {
+            File file = new File(filename);
+            int currentPoints = 0;
+
+            // Temporary storage for file content
+            List<String> fileContent = new ArrayList<>();
+
+            // Read current file content and extract points
+            if (file.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("Points: ")) {
+                            currentPoints = Integer.parseInt(line.replace("Points: ", "").trim());
+                        }
+                        fileContent.add(line); // Add all lines to storage
+                    }
+                } catch (IOException | NumberFormatException e) {
+                    System.err.println("Error reading membership file: " + e.getMessage());
+                }
+            }
+
+            // Deduct points if user chooses to redeem them
+            if (usePoints && currentPoints >= 100) {
+                receiptContent.append("Points Redeemed: -$5.00\n");
+                totalCost = Math.max(0, totalCost - 5.0); // $5 discount, minimum $0 total
+                currentPoints -= 100; // Deduct 100 points
+            }
+
+            // Add new points based on totalCost
+            int earnedPoints = (int) totalCost; // 1 point per dollar spent
+            currentPoints += earnedPoints;
+
+            // Update the `Points` line in the file content
+            for (int i = 0; i < fileContent.size(); i++) {
+                if (fileContent.get(i).startsWith("Points: ")) {
+                    fileContent.set(i, "Points: " + currentPoints);
+                }
+            }
+
+            // Write updated content back to the file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                for (String line : fileContent) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                System.err.println("Error updating membership file: " + e.getMessage());
+            }
+        }
+
         if (totalCost > userMoney) {
             return totalCost;
         }
@@ -297,6 +348,7 @@ public class GroceryStore {
 
         return totalCost;
     }
+
 
     public void clearCart(ArrayList<String> itemsToRetain) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("cart.txt"))) {
@@ -421,12 +473,15 @@ public class GroceryStore {
         }
     }
 
-    public List<Item> removeFiles() {
+    public List<Item> removeFiles()
+    {
         File f = new File(BASE);
-        if (f.isDirectory()) {
+        if(f.isDirectory())
+        {
             File[] files = f.listFiles();
             assert files != null;
-            for (int i = files.length - 1; i >= 0; i--) {
+            for(int i = files.length - 1; i >= 0; i--)
+            {
                 files[i].delete();
             }
         }
