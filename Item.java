@@ -9,43 +9,52 @@ public class Item implements Serializable {
     private String category;
     private double price;
     private int quantity;
-    private ArrayList<String> date; //sorted from smallest date (next to expire) to largest date (furthest from expiration)
+    private boolean glutenFree;
+    private boolean peanuts;
+    private boolean vegan;
+    private ArrayList<String> date; // sorted from smallest date (next to expire) to largest date (furthest from
+                                    // expiration)
 
-    public Item(String name, String category, double price, boolean taxable, boolean foodStamp, boolean tOPlus) {
+    public Item(String name, String category, double price, boolean taxable, boolean foodStamp, boolean tOPlus,
+            boolean glutenFree, boolean peanuts, boolean vegan) {
         this.name = name;
         this.category = category;
         this.price = price;
         this.taxable = taxable;
         this.foodStamp = foodStamp;
         twentyOnePlus = tOPlus;
+        this.glutenFree = glutenFree;
+        this.peanuts = peanuts;
+        this.vegan = vegan;
         this.quantity = 0;
         this.date = new ArrayList<>(); // Initialize date list
     }
 
-    public Item(String name, String category, double price, boolean taxable, boolean foodStamp, boolean tOPlus, int quantity, ArrayList<String> date) {
+    public Item(String name, String category, double price, boolean taxable, boolean foodStamp, boolean tOPlus,
+            boolean glutenFree, boolean peanuts, boolean vegan,
+            int quantity, ArrayList<String> date) {
         this.name = name;
         this.category = category;
         this.price = price;
         this.taxable = taxable;
         this.foodStamp = foodStamp;
         twentyOnePlus = tOPlus;
+        this.glutenFree = glutenFree;
+        this.peanuts = peanuts;
+        this.vegan = vegan;
         this.quantity = quantity;
         this.date = new ArrayList<>(date);
     }
 
     public void addQuantity(String date, int quantity) {
         this.quantity += quantity;
-        for(int j = 0; j <= this.date.size(); j++)
-        {
-            if(j == this.date.size())
-            {
+        for (int j = 0; j <= this.date.size(); j++) {
+            if (j == this.date.size()) {
                 for (int i = 0; i < quantity; i++) {
                     this.date.add(date);
                 }
                 break;
-            }
-            else if(date.compareTo(this.date.get(j)) < 0)
-            {
+            } else if (date.compareTo(this.date.get(j)) < 0) {
                 for (int i = 0; i < quantity; i++) {
                     this.date.add(j, date);
                 }
@@ -55,9 +64,8 @@ public class Item implements Serializable {
 
     }
 
-    public void removeDate(int toRemove)
-    {
-        for(int i = 0; i < toRemove; i++) {
+    public void removeDate(int toRemove) {
+        for (int i = 0; i < toRemove; i++) {
             if (quantity > 0) {
                 date.removeFirst();
                 quantity--;
@@ -69,7 +77,7 @@ public class Item implements Serializable {
         return name;
     }
 
-    public String getCategory(){
+    public String getCategory() {
         return category;
     }
 
@@ -93,20 +101,35 @@ public class Item implements Serializable {
         return twentyOnePlus;
     }
 
+    public boolean isGlutenFree() {
+        return glutenFree;
+    }
+
+    public boolean isPeanuts() {
+        return peanuts;
+    }
+
+    public boolean isVegan() {
+        return vegan;
+    }
+
     public ArrayList<String> getDateList() {
         return new ArrayList<>(date);
     }
 
     @Override
     public String toString() {
-        return name + "," + category + "," + String.format("%.2f", price) + "," + quantity + "," + taxable + "," + foodStamp + "," + twentyOnePlus + "," + String.join(",", date);
+        return name + "," + category + "," + String.format("%.2f", price) + "," + quantity + "," + taxable + ","
+                + foodStamp + "," + twentyOnePlus + "," + glutenFree + "," + peanuts + "," + vegan + ","
+                + String.join(",", date);
     }
 
     public static Item fromString(String line) {
         String[] parts = line.split(",");
 
-        // Ensure there are enough parts to create an Item, otherwise print an error and return null
-        if (parts.length < 6) {
+        // Ensure there are enough parts to create an Item, otherwise print an error and
+        // return null
+        if (parts.length < 9) {
             System.err.println("Error: Invalid line format. Skipping line: " + line);
             return null;
         }
@@ -118,6 +141,9 @@ public class Item implements Serializable {
         boolean taxable;
         boolean foodStamp;
         boolean twentyOnePlus;
+        boolean glutenFree;
+        boolean peanuts;
+        boolean vegan;
         ArrayList<String> date = new ArrayList<>();
 
         try {
@@ -126,9 +152,12 @@ public class Item implements Serializable {
             taxable = Boolean.parseBoolean(parts[4]);
             foodStamp = Boolean.parseBoolean(parts[5]);
             twentyOnePlus = Boolean.parseBoolean(parts[6]);
+            glutenFree = Boolean.parseBoolean(parts[7]);
+            peanuts = Boolean.parseBoolean(parts[8]);
+            vegan = Boolean.parseBoolean(parts[9]);
 
             // Collect any additional parts as dates, if available
-            for (int i = 7; i < parts.length; i++) {
+            for (int i = 10; i < parts.length; i++) {
                 date.add(parts[i]);
             }
 
@@ -137,7 +166,8 @@ public class Item implements Serializable {
             return null;
         }
 
-        return new Item(name, category, price, taxable, foodStamp, twentyOnePlus, quantity, date);
+        return new Item(name, category, price, taxable, foodStamp, twentyOnePlus, glutenFree, peanuts, vegan, quantity,
+                date);
     }
 
 }
