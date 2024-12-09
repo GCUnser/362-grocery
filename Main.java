@@ -695,6 +695,7 @@ public class Main {
                     }
 
                     break;
+                    
 
                 case 20:
                     List<Item> itemList;
