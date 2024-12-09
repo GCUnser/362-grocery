@@ -109,9 +109,10 @@ public class Main {
             System.out.println("18. Transfer Employees");
             System.out.println("19. Employees currently on the clock");
             System.out.println("20. Remove Store from Chain");
-            System.out.println("21. Employee promotion");
-            System.out.println("22. View product promotions");
-            System.out.println("23. Exit");
+            System.out.println("22. Employee promotion");
+            System.out.println("23. View product promotions");
+            System.out.println("24. Add product promotions");
+            System.out.println("21. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -724,28 +725,61 @@ public class Main {
                     scanner.close();
                     return;
                 case 22:
-                    System.out.println("Enter manager name");
-                    String managerName = scanner.nextLine();
-                    System.out.println("Enter manager ID");
-                    String managerID = scanner.nextLine();
-                    System.out.println("Enter employee name");
-                    String employeeName = scanner.nextLine();
-                    System.out.println("Enter employee ID");
-                    String employeeID = scanner.nextLine();
-                    System.out.println("Type \"confirm\" to approve promotion");
-
-                    if (scanner.next().equalsIgnoreCase("confirm")) {
-                        EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
-                                managerName);
-                        try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
-                            writer.write(promotion.toString());
-                            System.out.println("Promotion approved, results written to employee_promotions.txt");
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    HashMap<String, String> managers = new HashMap<String, String>();
+                    try (BufferedReader br = new BufferedReader(new FileReader("managersList.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            // Trim and check if the line starts with the key followed by a comma (e.g.,
+                            // "1,")
+                            line = line.trim();
+                            if (!line.isEmpty()) {
+                                String[] parts = line.split(", ");
+                                managers.put(parts[1], parts[0]);
+                            }
                         }
-                    } else {
-                        System.out.println("Promotion cancelled");
+
+                        String managerID = "";
+                        System.out.println("Enter manager ID");
+
+                        while (!managers.containsKey(managerID)) {
+                            managerID = scanner.nextLine();
+                            if (!managers.containsKey(managerID)) {
+                                System.out.println("Unrecognized ID. Please try again");
+                            }
+                        }
+
+                        String managerName = "";
+                        System.out.println("Enter manager name");
+
+                        while (!managers.get(managerID).equals(managerName)) {
+                            managerName = scanner.nextLine();
+                            if (!managers.get(managerID).equals(managerName)) {
+                                System.out.println("Unrecognized name. Please try again");
+                            }
+                        }
+                        System.out.println("Enter employee name");
+                        String employeeName = scanner.nextLine();
+                        System.out.println("Enter employee ID");
+                        String employeeID = scanner.nextLine();
+                        System.out.println("Type \"confirm\" to approve promotion");
+
+                        if (scanner.next().equalsIgnoreCase("confirm")) {
+                            EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
+                                    managerName);
+                            try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
+                                writer.write(promotion.toString());
+                                System.out.println("Promotion approved, results written to employee_promotions.txt");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println("Promotion cancelled");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+
+                    break;
                 case 23:
                     HashMap<String, Integer> promotions = new HashMap<String, Integer>();
                     promotions.put("wirhjoiwrhj", 92306709);
@@ -757,7 +791,9 @@ public class Main {
                     for (String s : promotions.keySet()) {
                         System.out.println("\n" + s + ": " + promotions.get(s) + " weeks");
                     }
-
+                    break;
+                case 24:
+                    break;
                 default:
                     System.out.println("Invalid choice, please try again.");
             }

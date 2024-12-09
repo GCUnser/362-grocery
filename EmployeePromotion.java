@@ -14,7 +14,7 @@ public class EmployeePromotion {
 
     @Override
     public String toString() {
-        return employeeName + " (" + employeeID + "); approved by"
+        return employeeName + " (" + employeeID + "); approved by "
                 + managerName + " (" + managerID + ")";
     }
 

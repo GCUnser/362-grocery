@@ -15,4 +15,9 @@ public class ProductPromotion {
         return promotionPeriod;
     }
 
+    @Override
+    public String toString() {
+        return "ProductPromotion [productName=" + productName + ", promotionPeriod=" + promotionPeriod + "]";
+    }
+
 }
