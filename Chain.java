@@ -121,6 +121,10 @@ public class Chain {
         return inventory;
     }
 
+    public List<Contract> getContracts(){
+        return contracts;
+    }
+
     public void addItem(Item item) {
         inventory.add(item);
         saveInventory();

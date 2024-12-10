@@ -45,8 +45,9 @@ public class Main {
             System.out.println("Choose an option:");
             System.out.println("1. Add a new store location");
             System.out.println("2. Add an item to Chain Inventory");
+            System.out.println("3. View Contract Information");
             for (int i = 0; i < locations.size(); i++) {
-                System.out.println((i + 3) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new store"
+                System.out.println((i + 4) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new store"
             }
             System.out.print("Enter the number of your choice: ");
             String input = scanner.nextLine();
@@ -139,8 +140,102 @@ public class Main {
                         System.out.println("Item added successfully!\n");
                     }
                 }
-                else if (choice >= 3 && choice <= locations.size() + 2) {
-                    city = locations.get(choice - 3); // Offset by 2 since option 1 is "Add a new store"
+                else if(choice == 3){
+                    boolean contractOptions = true;
+                    while(contractOptions){
+                        int contractChoice;
+                        System.out.println("Choose an option:");
+                        System.out.println("1. Add/Renew Contract");
+                        System.out.println("2. Add an item to specified Contract");
+                        System.out.println("3. Terminate/Remove Contract");
+                        System.out.println("4. Return to Store Selection");
+                        System.out.print("Enter the number of your choice: ");
+                        input = scanner.nextLine();
+
+                        try{
+                            contractChoice = Integer.parseInt(input);
+                            int contractNumber = 1;
+                            switch(contractChoice){
+                                case 1:
+                                    System.out.println("Input a new name to add a new contract, otherwise select the contract to renew.");
+
+                                    for(Contract c : chain.getContracts()){
+                                        System.out.println(contractNumber + ". " + c.getContractName() + ": Price to renew: " + c.getRenewPrice());
+                                        contractNumber++;
+                                    }
+                                    input = scanner.nextLine();
+
+                                    for(Contract c : chain.getContracts()){
+                                        if(input.equalsIgnoreCase(c.getContractName())){
+                                            System.out.println("Trying to renew contract " + c.getContractName());
+                                            if(chain.getMoney() >= c.getRenewPrice()){
+                                                chain.removeMoney(c.getRenewPrice());
+                                                System.out.println("Contract renewed, please input new expiration date (Format YYYY-mm-dd)");
+                                                input = scanner.nextLine();
+                                                c.updateDate(input);
+                                            }
+                                            else{
+                                                System.out.println("Not enough money to renew contract");
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+
+                                case 2:
+                                    System.out.println("Input contract name to add an item to");
+                                    for(Contract c : chain.getContracts()){
+                                        System.out.println(contractNumber + ". " + c.getContractName() + ": Price to add new item: " + c.getAddItemPrice());
+                                        contractNumber++;
+                                    }
+                                    input = scanner.nextLine();
+                                    for(Contract c : chain.getContracts()){
+                                        if(input.equalsIgnoreCase(c.getContractName())){
+                                            System.out.println("Trying to add item to contract " + c.getContractName());
+                                            if(chain.getMoney() >= c.getAddItemPrice()){
+                                                chain.removeMoney(c.getAddItemPrice());
+                                                System.out.println("Pay completed: please enter item name to add");
+                                                input = scanner.nextLine();
+                                                boolean haveItem = false;
+                                                for(Item i : c.getInventory()){
+                                                    if(i.getName().equalsIgnoreCase(input)){
+                                                        System.out.println("Item already exists in contract");
+                                                        haveItem = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if(!haveItem){
+                                                    System.out.println("Please enter item category");
+                                                    String itemCategory = scanner.nextLine();
+                                                    System.out.println("Please enter item price");
+                                                    double itemPrice = Double.parseDouble(scanner.nextLine());
+                                                    c.addItemToContract(new Item(input, itemCategory, itemPrice));
+                                                }
+                                            }
+                                            else{
+                                                System.out.println("Not enough money to add new item to contract");
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+
+
+                                case 4:
+                                    contractOptions = false;
+                                    break;
+
+                                default:
+                                    System.out.println("Please input a valid choice");
+                            }
+
+                        } catch(NumberFormatException e){
+                            System.out.println("Invalid input. Please enter a number.");
+                        }
+                    }
+                }
+                else if (choice >= 4 && choice <= locations.size() + 4) {
+                    city = locations.get(choice - 4); // Offset by 2 since option 1 is "Add a new store"
                     System.out.println("You selected: " + city);
                     valid = true;
                 } else {

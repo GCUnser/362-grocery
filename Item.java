@@ -53,6 +53,9 @@ public class Item implements Serializable {
         this.taxable = false;
         this.foodStamp = false;
         twentyOnePlus = false;
+        glutenFree = false;
+        peanuts = false;
+        vegan = false;
         this.date = new ArrayList<>();
     }
 
