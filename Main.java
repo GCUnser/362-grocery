@@ -176,7 +176,9 @@ public class Main {
             System.out.println("22. View Membership");
             System.out.println("23. Upgrade Membership");
             System.out.println("24. Delete Membership");
-            System.out.println("25. Exit");
+            System.out.println("25. Coupons");
+            System.out.println("26. Replace Expired Items");
+            System.out.println("27. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -708,6 +710,7 @@ public class Main {
                     }
                     break;
 
+
                 case 15:
                     System.out.print("Enter the item to put on sale: ");
                     name = scanner.nextLine();
@@ -724,7 +727,11 @@ public class Main {
                         limit = scanner.next();
                         scanner.nextLine();
                     }
-                    saleItems.addSale(city,name,discount, yOrN.equalsIgnoreCase("y"), limit);
+                    if(yOrN.equalsIgnoreCase("y")) {
+                        saleItems.addSale(city,name,discount, true, limit);
+                    } else {
+                        saleItems.addSale(city, name, discount, false, limit);
+                    }
                     break;
 
                 case 16:
@@ -843,7 +850,9 @@ public class Main {
                         e.printStackTrace();
                     }
 
+
                     break;
+
 
                 case 19:
 
@@ -916,10 +925,79 @@ public class Main {
                 case 23:
                     LoyaltyProgram.upgradeMembership();
                     break;
+
                 case 24:
                     LoyaltyProgram.deleteMembership();
                     break;
+
                 case 25:
+                    //Coupons
+
+                    HashMap<String, String> coupons = new HashMap<>();
+
+                    // Read the file and populate the HashMap
+                    try (BufferedReader br = new BufferedReader(new FileReader("coupon.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            // Split the line into components: ID, category, and coupon code
+                            String[] parts = line.split(", ");
+                            if (parts.length == 3) {
+                                category = parts[1].replaceAll("\"", ""); // Remove quotes
+                                String couponCode = parts[2].replaceAll("\"", ""); // Remove quotes
+                                coupons.put(couponCode, category);
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Error reading the file: " + e.getMessage());
+                        return;
+                    }
+
+                    // Ask the user for a coupon code
+                    scanner = new Scanner(System.in);
+                    System.out.println("Enter a coupon code:");
+                    String userInput = scanner.nextLine();
+
+                    // Check if the coupon code exists in the HashMap
+                    if (coupons.containsKey(userInput)) {
+                        category = coupons.get(userInput);
+                        System.out.println("You can get 1 free for buying 1 in the category: " + category);
+                    } else {
+                        System.out.println("Invalid coupon code.");
+                    }
+
+                    break;
+                case 26:
+                    HashMap<String, String> expiredItems = new HashMap<>();
+                    String fileName = "expiredItems.txt";
+
+                    try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                        String line;
+
+                        while ((line = br.readLine()) != null) {
+                            // Parse the line
+                            String[] parts = line.split(", ");
+                            if (parts.length == 2) {
+                                itemName = parts[0].replace("\"", "").trim();
+                                String status = parts[1].replace("\"", "").trim();
+                                expiredItems.put(itemName, status);
+
+                                // Check expiration status and print message
+                                if ("Expired".equalsIgnoreCase(status)) {
+                                    System.out.println(itemName + " has expired. It has been replaced.");
+                                } else {
+                                    System.out.println(itemName + " is not expired.");
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.err.println("Error reading file: " + e.getMessage());
+                    }
+
+
+
+                    break;
+
+                case 27:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");
