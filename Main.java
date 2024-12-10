@@ -342,9 +342,10 @@ public class Main {
                     System.out.println("Inventory:");
                     for (Item i : store.getInventory()) {
                         System.out.printf(
-                                "%s - %s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Only 21+ can buy: %b -  Expiration Dates: %s%n",
+                                "%s - %s - $%.2f - Quantity: %d - Taxable: %b - Food Stamp Eligible: %b - Only 21+ can buy: %b - Gluten-free: %b - Peanuts: %b - Vegan: %b - Expiration Dates: %s%n",
                                 i.getName(), i.getCategory(), i.getPrice(), i.getQuantity(), i.isTaxable(),
-                                i.isFoodStampEligible(), i.forTwentyOnePlus(), i.getDateList());
+                                i.isFoodStampEligible(), i.forTwentyOnePlus(), i.isGlutenFree(), i.isPeanuts(),
+                                i.isVegan(), i.getDateList());
                     }
                     System.out.println();
                     break;
