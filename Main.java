@@ -123,10 +123,19 @@ public class Main {
                         System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
                         boolean twentyOnePlus;
                         twentyOnePlus = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item is gluten-free (y or n): ");
+                        boolean glutenFree;
+                        glutenFree = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item contains peanuts (y or n): ");
+                        boolean peanuts;
+                        peanuts = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item is vegan (y or n): ");
+                        boolean vegan;
+                        vegan = scanner.next().equalsIgnoreCase("y");
                         scanner.nextLine(); // Consume newline
 
                         Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
-                                twentyOnePlus);
+                                twentyOnePlus, glutenFree, peanuts, vegan);
                         chain.addItem(item);
                         System.out.println("Item added successfully!\n");
                     }
@@ -1038,8 +1047,6 @@ public class Main {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    break;
-
                     break;
                 case 28:
                     HashMap<String, Integer> promotions = new HashMap<String, Integer>();
