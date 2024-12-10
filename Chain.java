@@ -10,17 +10,16 @@ public class Chain {
     private static final String INVENTORY_FILE = "chainInventory.txt";
     private static final List<Item> inventory = new ArrayList<>();
 
-    public Chain() {
+    public Chain()
+    {
         loadInventory();
     }
 
     /**
-     * Adds a new location to the chain by updating the locations file and creating
-     * a new inventory folder.
+     * Adds a new location to the chain by updating the locations file and creating a new inventory folder.
      *
      * @param locationName Name of the new location.
-     * @throws IOException if there are issues writing to the file or creating the
-     *                     folder.
+     * @throws IOException if there are issues writing to the file or creating the folder.
      */
     public boolean addNewLocation(String locationName) throws IOException {
         // Check if location already exists
@@ -57,20 +56,24 @@ public class Chain {
         return true;
     }
 
-    public void removeLocation(String locationName) throws IOException {
-        if (locationExists(locationName)) {
+    public void removeLocation(String locationName) throws IOException
+    {
+        if(locationExists(locationName))
+        {
             ArrayList<String> names = new ArrayList<>();
             try (BufferedReader reader = new BufferedReader(new FileReader(LOCATIONS_FILE))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (!line.trim().equalsIgnoreCase(locationName.trim())) {
+                    if(!line.trim().equalsIgnoreCase(locationName.trim()))
+                    {
                         names.add(line);
                     }
 
                 }
             }
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOCATIONS_FILE))) {
-                for (int i = 0; i < names.size(); i++) {
+                for(int i = 0; i < names.size(); i++)
+                {
                     writer.write(names.get(i));
                     writer.newLine();
                 }
@@ -80,19 +83,28 @@ public class Chain {
 
     }
 
-    public void addItemToStock(Item toAdd) {
-        for (Item i : inventory) {
-            if (i.getName().equalsIgnoreCase(toAdd.getName())) {
+    public void addItemToStock(Item toAdd)
+    {
+        for(Item i: inventory)
+        {
+            if(i.getName().equalsIgnoreCase(toAdd.getName()))
+            {
                 String date = "";
                 int k = 0;
-                for (int j = 0; j < toAdd.getQuantity(); j++) {
-                    if (date.equals(toAdd.getDateList().get(j))) {
+                for(int j = 0; j < toAdd.getQuantity(); j++)
+                {
+                    if(date.equals(toAdd.getDateList().get(j)))
+                    {
                         k++;
-                    } else if (!date.isEmpty() && !date.equals(toAdd.getDateList().get(j))) {
+                    }
+                    else if(!date.isEmpty() && !date.equals(toAdd.getDateList().get(j)))
+                    {
                         i.addQuantity(date, k);
                         date = toAdd.getDateList().get(j);
                         k++;
-                    } else {
+                    }
+                    else
+                    {
                         date = toAdd.getDateList().get(j);
                         k = 1;
                     }
@@ -102,6 +114,57 @@ public class Chain {
             break;
         }
         saveInventory();
+    }
+
+    public List<Item> getInventory() {
+        return inventory;
+    }
+
+    public void addItem(Item item) {
+        inventory.add(item);
+        saveInventory();
+    }
+
+    public void addItemQuantity(String date, int quantity, Item i)
+    {
+        i.addQuantity(date, quantity);
+        saveInventory();
+    }
+
+    public double getMoney()
+    {
+        double currentProfit = 0.0;
+        try (BufferedReader reader = new BufferedReader(new FileReader("profit.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                currentProfit = Double.parseDouble(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error getting profit.txt: " + e.getMessage());
+        }
+        return currentProfit;
+    }
+
+    public void removeMoney(double amount)
+    {
+        try {
+            // Read the current profit value
+            double currentProfit = 0.0;
+            try (BufferedReader reader = new BufferedReader(new FileReader("profit.txt"))) {
+                String line = reader.readLine();
+                if (line != null) {
+                    currentProfit = Double.parseDouble(line);
+                }
+            }
+
+            // Update the profit
+            currentProfit = currentProfit - amount;
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("profit.txt"))) {
+                writer.write(String.format("%.2f", currentProfit));
+            }
+        } catch (IOException e) {
+            System.err.println("Error updating profit.txt: " + e.getMessage());
+        }
     }
 
     /**

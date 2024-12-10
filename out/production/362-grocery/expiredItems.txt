@@ -1,0 +1,4 @@
+"Milk", "Expired"
+"Yogurt", "Not Expired"
+"Bread", "Expired"
+

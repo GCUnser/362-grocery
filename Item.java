@@ -47,7 +47,6 @@ public class Item implements Serializable {
     }
 
     public void addQuantity(String date, int quantity) {
-        this.quantity += quantity;
         for (int j = 0; j <= this.date.size(); j++) {
             if (j == this.date.size()) {
                 for (int i = 0; i < quantity; i++) {
@@ -66,9 +65,8 @@ public class Item implements Serializable {
 
     public void removeDate(int toRemove) {
         for (int i = 0; i < toRemove; i++) {
-            if (quantity > 0) {
+            if (!date.isEmpty()) {
                 date.removeFirst();
-                quantity--;
             }
         }
     }
@@ -90,7 +88,7 @@ public class Item implements Serializable {
     }
 
     public int getQuantity() {
-        return quantity;
+        return date.size();
     }
 
     public boolean isTaxable() {
