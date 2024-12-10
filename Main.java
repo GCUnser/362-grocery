@@ -124,11 +124,11 @@ public class Main {
             System.out.println("18. Transfer Employees");
             System.out.println("19. Employees currently on the clock");
             System.out.println("20. Remove Store from Chain");
-            System.out.println("22. Employee promotion");
-            System.out.println("23. View product promotions");
-            System.out.println("24. Add product promotions");
-            System.out.println("31. Increase storewide prices");
-            System.out.println("21. Exit");
+            System.out.println("27. Employee promotion");
+            System.out.println("28. View product promotions");
+            System.out.println("29. Add product promotions");
+            System.out.println("30. Increase storewide prices");
+            System.out.println("31. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -742,58 +742,7 @@ public class Main {
                     store.clearCart(end); // clear the cart when exiting
                     scanner.close();
                     return;
-
-                case 21:
-                    ArrayList<String> empty = new ArrayList<>();
-                    store.clearCart(empty); // clear the cart when exiting
-                    System.out.println("Exiting...");
-                    scanner.close();
-                    return;
-                case 22:
-                    try {
-                        String managerID = "";
-                        System.out.println("Enter manager ID");
-
-                        while (!managers.containsKey(managerID)) {
-                            managerID = scanner.nextLine();
-                            if (!managers.containsKey(managerID)) {
-                                System.out.println("Unrecognized ID. Please try again");
-                            }
-                        }
-
-                        String managerName = "";
-                        System.out.println("Enter manager name");
-
-                        while (!managers.get(managerID).equals(managerName)) {
-                            managerName = scanner.nextLine();
-                            if (!managers.get(managerID).equals(managerName)) {
-                                System.out.println("Unrecognized name. Please try again");
-                            }
-                        }
-                        System.out.println("Enter employee name");
-                        String employeeName = scanner.nextLine();
-                        System.out.println("Enter employee ID");
-                        String employeeID = scanner.nextLine();
-                        System.out.println("Type \"confirm\" to approve promotion");
-
-                        if (scanner.next().equalsIgnoreCase("confirm")) {
-                            EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
-                                    managerName);
-                            try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
-                                writer.write(promotion.toString());
-                                System.out.println("Promotion approved, results written to employee_promotions.txt");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            System.out.println("Promotion cancelled");
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    break;
-                case 23:
+                case 28:
                     HashMap<String, Integer> promotions = new HashMap<String, Integer>();
                     promotions.put("wirhjoiwrhj", 92306709);
                     promotions.put("i5rhjoiwh", 49683946);
@@ -805,7 +754,51 @@ public class Main {
                         System.out.println("\n" + s + ": " + promotions.get(s) + " weeks");
                     }
                     break;
-                case 31:
+                case 29:
+                    try {
+                        String managerID = "";
+                        System.out.println("Enter manager ID");
+
+                        while (!managers.containsKey(managerID)) {
+                            managerID = scanner.nextLine();
+                            if (!managers.containsKey(managerID)) {
+                                System.out.println("Unrecognized ID. Please try again");
+                            }
+                        }
+
+                        String managerName = "";
+                        System.out.println("Enter manager name");
+
+                        while (!managers.get(managerID).equals(managerName)) {
+                            managerName = scanner.nextLine();
+                            if (!managers.get(managerID).equals(managerName)) {
+                                System.out.println("Unrecognized name. Please try again");
+                            }
+                        }
+                        System.out.println("Enter employee name");
+                        String employeeName = scanner.nextLine();
+                        System.out.println("Enter employee ID");
+                        String employeeID = scanner.nextLine();
+                        System.out.println("Type \"confirm\" to approve promotion");
+
+                        if (scanner.next().equalsIgnoreCase("confirm")) {
+                            EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
+                                    managerName);
+                            try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
+                                writer.write(promotion.toString());
+                                System.out.println("Promotion approved, results written to employee_promotions.txt");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println("Promotion cancelled");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    break;
+                case 27:
                     try {
                         String managerID = "";
                         System.out.println("Enter manager ID");
@@ -848,11 +841,25 @@ public class Main {
                         e.printStackTrace();
                     }
                     break;
-                case 24:
+                case 30:
+                    System.out.println("Increase prices by what amount?");
+                    double amount = scanner.nextDouble();
+                    System.out.println("Increase storewide prices by $" + amount + "? (y)");
+                    if (scanner.next().equalsIgnoreCase("y")) {
+                        for (Item i : store.getInventory()) {
+                            i.increasePrice(amount);
+                        }
+                        System.out.println("Prices increased");
+                    } else {
+                        System.out.println("Price increase cancelled");
+                    }
                     break;
-                case 32:
-
-                    break;
+                case 31:
+                    ArrayList<String> empty = new ArrayList<>();
+                    store.clearCart(empty); // clear the cart when exiting
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
                 default:
                     System.out.println("Invalid choice, please try again.");
             }
