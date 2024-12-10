@@ -9,10 +9,12 @@ public class Chain {
     private static final String LOCATIONS_FILE = "locations.txt";
     private static final String INVENTORY_FILE = "chainInventory.txt";
     private static final List<Item> inventory = new ArrayList<>();
+    private static final List<Contract> contracts = new ArrayList<>();
 
     public Chain()
     {
         loadInventory();
+        loadContracts();
     }
 
     /**
@@ -72,9 +74,8 @@ public class Chain {
                 }
             }
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOCATIONS_FILE))) {
-                for(int i = 0; i < names.size(); i++)
-                {
-                    writer.write(names.get(i));
+                for (String name : names) {
+                    writer.write(name);
                     writer.newLine();
                 }
             }
@@ -282,6 +283,28 @@ public class Chain {
             }
         } catch (IOException e) {
             System.out.println("Error saving inventory: " + e.getMessage());
+        }
+    }
+
+    private void loadContracts() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Contracts.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                contracts.add(Contract.fromString(line));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading contract: " + e.getMessage());
+        }
+    }
+
+    private void saveContract() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Contracts.txt"))) {
+            for (Contract contract : contracts) {
+                writer.write(contract.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving contract: " + e.getMessage());
         }
     }
 }

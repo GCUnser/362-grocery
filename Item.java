@@ -30,6 +30,16 @@ public class Item implements Serializable {
         this.date = new ArrayList<>(date);
     }
 
+    public Item(String name, String category, double price){
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.taxable = false;
+        this.foodStamp = false;
+        twentyOnePlus = false;
+        this.date = new ArrayList<>();
+    }
+
     public void addQuantity(String date, int quantity) {
         for(int j = 0; j <= this.date.size(); j++)
         {

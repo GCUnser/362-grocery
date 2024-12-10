@@ -235,10 +235,35 @@ public class Main {
                                             quantity--;
                                         }
                                     }
+                                    correctName = false;
                                     break;
                                 }
                             }
-                            correctName = false;
+                            if(correctName){
+                                store.addItem(i);
+                                Item ib = store.getInventory().getLast();
+                                for(int k = ib.getQuantity() - 1; k > quantity; k--){
+                                    ib.getDateList().removeLast();
+                                }
+                                int j = 0;
+                                for(int k = 0; k < quantity; k++){
+                                    i.removeDate(0);
+                                    j++;
+                                }
+                                if(quantity > j){
+                                    quantity = quantity - j;
+                                    if(ib.getPrice() * quantity < chain.getMoney()){
+                                        System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
+                                        String date = scanner.next();
+                                        store.addItemQuantity(date, quantity, ib);
+                                        chain.removeMoney(ib.getPrice() * quantity);
+                                    }
+                                    else{
+                                        System.out.println("Not enough money in chain to add all requested quantity.");
+                                    }
+                                }
+                                correctName = false;
+                            }
                             break;
                         }
                     }
@@ -699,11 +724,7 @@ public class Main {
                         limit = scanner.next();
                         scanner.nextLine();
                     }
-                    if(yOrN.equalsIgnoreCase("y")) {
-                        saleItems.addSale(city,name,discount, true, limit);
-                    } else {
-                        saleItems.addSale(city, name, discount, false, limit);
-                    }
+                    saleItems.addSale(city,name,discount, yOrN.equalsIgnoreCase("y"), limit);
                     break;
 
                 case 16:
