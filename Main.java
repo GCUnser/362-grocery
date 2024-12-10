@@ -122,10 +122,19 @@ public class Main {
                         System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
                         boolean twentyOnePlus;
                         twentyOnePlus = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item is gluten-free (y or n): ");
+                        boolean glutenFree;
+                        glutenFree = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item contains peanuts (y or n): ");
+                        boolean peanuts;
+                        peanuts = scanner.next().equalsIgnoreCase("y");
+                        System.out.print("Enter if item is vegan (y or n): ");
+                        boolean vegan;
+                        vegan = scanner.next().equalsIgnoreCase("y");
                         scanner.nextLine(); // Consume newline
 
                         Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
-                                twentyOnePlus);
+                                twentyOnePlus, glutenFree, peanuts, vegan);
                         chain.addItem(item);
                         System.out.println("Item added successfully!\n");
                     }
@@ -150,6 +159,20 @@ public class Main {
         GroceryStore store = new GroceryStore(city);
         Cart cart = new Cart(city);
 
+        // Load managers
+        HashMap<String, String> managers = new HashMap<String, String>();
+        try (BufferedReader br = new BufferedReader(new FileReader("managersList.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    String[] parts = line.split(", ");
+                    managers.put(parts[1], parts[0]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         while (true) {
             System.out.println("1. Add Item");
@@ -178,7 +201,11 @@ public class Main {
             System.out.println("24. Delete Membership");
             System.out.println("25. Coupons");
             System.out.println("26. Replace Expired Items");
-            System.out.println("27. Exit");
+            System.out.println("27. Employee promotion");
+            System.out.println("28. View product promotions");
+            System.out.println("29. Add product promotions");
+            System.out.println("30. Increase storewide prices");
+            System.out.println("31. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over
@@ -212,10 +239,8 @@ public class Main {
                             }
                             for (Item ib : store.getInventory()) {
                                 if (ib.getName().compareTo(name.toLowerCase()) == 0) {
-                                    if(quantity > i.getQuantity())
-                                    {
-                                        for(String date : i.getDateList())
-                                        {
+                                    if (quantity > i.getQuantity()) {
+                                        for (String date : i.getDateList()) {
                                             ib.addQuantity(date, 1);
                                             quantity--;
                                         }
@@ -283,7 +308,7 @@ public class Main {
                                 System.out.print("Enter item quantity to add: ");
                                 quantity = scanner.nextInt();
                             }
-                            if(i.getPrice() * quantity < chain.getMoney()){
+                            if (i.getPrice() * quantity < chain.getMoney()) {
                                 System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
                                 String date = scanner.next();
                                 store.addItemQuantity(date, quantity, i);
@@ -314,10 +339,19 @@ public class Main {
                     System.out.print("Enter if item requires being 21 or older to purchase (y or n): ");
                     boolean twentyOnePlus;
                     twentyOnePlus = scanner.next().equalsIgnoreCase("y");
+                    System.out.print("Enter if item is gluten-free (y or n): ");
+                    boolean glutenFree;
+                    glutenFree = scanner.next().equalsIgnoreCase("y");
+                    System.out.print("Enter if item contains peanuts (y or n): ");
+                    boolean peanuts;
+                    peanuts = scanner.next().equalsIgnoreCase("y");
+                    System.out.print("Enter if item is vegan (y or n): ");
+                    boolean vegan;
+                    vegan = scanner.next().equalsIgnoreCase("y");
                     scanner.nextLine(); // Consume newline
 
                     Item item = new Item(name.toLowerCase(), category.toLowerCase(), price, taxable, foodStamp,
-                            twentyOnePlus);
+                            twentyOnePlus, glutenFree, peanuts, vegan);
                     store.addItem(item);
                     System.out.println("Item added successfully!\n");
                     break;
@@ -439,7 +473,7 @@ public class Main {
                             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                                 String line;
                                 while ((line = reader.readLine()) != null) {
-                                    if(line.startsWith("Subscription Type: Premium")) {
+                                    if (line.startsWith("Subscription Type: Premium")) {
                                         premium = true;
                                     }
                                     if (line.startsWith("Points: ")) {
@@ -454,7 +488,8 @@ public class Main {
 
                             // Ask if they want to redeem points if they have 100 or more
                             if (userPoints >= 100) {
-                                System.out.println("You have " + userPoints + " points. Would you like to redeem 100 points for a $5 discount? (y/n): ");
+                                System.out.println("You have " + userPoints
+                                        + " points. Would you like to redeem 100 points for a $5 discount? (y/n): ");
                                 if (scanner.next().equalsIgnoreCase("y")) {
                                     usePoints = true;
                                     userPoints -= 100; // Deduct 100 points for redemption
@@ -765,7 +800,7 @@ public class Main {
                         return;
                     }
 
-// Load store branch data from file
+                    // Load store branch data from file
                     try (BufferedReader br = new BufferedReader(new FileReader("storeBranch.txt"))) {
                         String line;
                         while ((line = br.readLine()) != null) {
@@ -781,7 +816,7 @@ public class Main {
                         return;
                     }
 
-// Use the existing Scanner object for user input
+                    // Use the existing Scanner object for user input
                     try (FileWriter writer = new FileWriter("transferResults.txt")) {
                         for (int employeeId : transferEmployees.keySet()) {
                             String employeeName = transferEmployees.get(employeeId);
@@ -894,6 +929,7 @@ public class Main {
                     }
 
                     break;
+                    
 
                 case 20:
                     List<Item> itemList;
@@ -930,8 +966,9 @@ public class Main {
                     LoyaltyProgram.deleteMembership();
                     break;
 
+
                 case 25:
-                    //Coupons
+                    // Coupons
 
                     HashMap<String, String> coupons = new HashMap<>();
 
@@ -992,12 +1029,120 @@ public class Main {
                     } catch (IOException e) {
                         System.err.println("Error reading file: " + e.getMessage());
                     }
+                case 27:
+                    try {
+                        String managerID = "";
+                        System.out.println("Enter manager ID");
 
+                        while (!managers.containsKey(managerID)) {
+                            managerID = scanner.nextLine();
+                            if (!managers.containsKey(managerID)) {
+                                System.out.println("Unrecognized ID. Please try again");
+                            }
+                        }
 
+                        String managerName = "";
+                        System.out.println("Enter manager name");
+
+                        while (!managers.get(managerID).equals(managerName)) {
+                            managerName = scanner.nextLine();
+                            if (!managers.get(managerID).equals(managerName)) {
+                                System.out.println("Unrecognized name. Please try again");
+                            }
+                        }
+                        System.out.println("Enter employee name");
+                        String employeeName = scanner.nextLine();
+                        System.out.println("Enter employee ID");
+                        String employeeID = scanner.nextLine();
+                        System.out.println("Type \"confirm\" to approve promotion");
+
+                        if (scanner.next().equalsIgnoreCase("confirm")) {
+                            EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
+                                    managerName);
+                            try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
+                                writer.write(promotion.toString());
+                                System.out.println("Promotion approved, results written to employee_promotions.txt");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println("Promotion cancelled");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 28:
+                    HashMap<String, Integer> promotions = new HashMap<String, Integer>();
+                    promotions.put("wirhjoiwrhj", 92306709);
+                    promotions.put("i5rhjoiwh", 49683946);
+                    promotions.put("kbgmnlklrit", 58075789);
+
+                    System.out.println("Current product promotions:");
+
+                    for (String s : promotions.keySet()) {
+                        System.out.println("\n" + s + ": " + promotions.get(s) + " weeks");
+                    }
+                    break;
+                case 29:
+                    try {
+                        String managerID = "";
+                        System.out.println("Enter manager ID");
+
+                        while (!managers.containsKey(managerID)) {
+                            managerID = scanner.nextLine();
+                            if (!managers.containsKey(managerID)) {
+                                System.out.println("Unrecognized ID. Please try again");
+                            }
+                        }
+
+                        String managerName = "";
+                        System.out.println("Enter manager name");
+
+                        while (!managers.get(managerID).equals(managerName)) {
+                            managerName = scanner.nextLine();
+                            if (!managers.get(managerID).equals(managerName)) {
+                                System.out.println("Unrecognized name. Please try again");
+                            }
+                        }
+                        System.out.println("Enter employee name");
+                        String employeeName = scanner.nextLine();
+                        System.out.println("Enter employee ID");
+                        String employeeID = scanner.nextLine();
+                        System.out.println("Type \"confirm\" to approve promotion");
+
+                        if (scanner.next().equalsIgnoreCase("confirm")) {
+                            EmployeePromotion promotion = new EmployeePromotion(employeeID, employeeName, managerID,
+                                    managerName);
+                            try (FileWriter writer = new FileWriter("employee_promotions.txt")) {
+                                writer.write(promotion.toString());
+                                System.out.println("Promotion approved, results written to employee_promotions.txt");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println("Promotion cancelled");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     break;
 
-                case 27:
+                case 30:
+                    System.out.println("Increase prices by what amount?");
+                    double amount = scanner.nextDouble();
+                    System.out.println("Increase storewide prices by $" + amount + "? (y)");
+                    if (scanner.next().equalsIgnoreCase("y")) {
+                        for (Item i : store.getInventory()) {
+                            i.increasePrice(amount);
+                        }
+                        System.out.println("Prices increased");
+                    } else {
+                        System.out.println("Price increase cancelled");
+                    }
+                    break;
+                case 31:
                     ArrayList<String> empty = new ArrayList<>();
                     store.clearCart(empty); // clear the cart when exiting
                     System.out.println("Exiting...");

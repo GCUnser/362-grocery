@@ -213,6 +213,9 @@ public class Chain {
                 boolean taxable = getYesNoInput(scanner, "Is the item taxable? (y/n): ");
                 boolean foodStamp = getYesNoInput(scanner, "Is the item eligible for food stamps? (y/n): ");
                 boolean twentyOnePlus = getYesNoInput(scanner, "Is the item for 21+ only? (y/n): ");
+                boolean glutenFree = getYesNoInput(scanner, "Is the item gluten-free? (y/n): ");
+                boolean peanuts = getYesNoInput(scanner, "Does the item contain peanuts? (y/n): ");
+                boolean vegan = getYesNoInput(scanner, "Is the item vegan? (y/n): ");
 
                 System.out.print("Quantity: ");
                 int quantity = Integer.parseInt(scanner.nextLine());
@@ -227,7 +230,8 @@ public class Chain {
                 }
 
                 // Create a new Item instance
-                Item item = new Item(name, category, price, taxable, foodStamp, twentyOnePlus, quantity, dateList);
+                Item item = new Item(name, category, price, taxable, foodStamp, twentyOnePlus, glutenFree, peanuts,
+                        vegan, quantity, dateList);
 
                 // Write item to the inventory file
                 writer.write(item.toString());
