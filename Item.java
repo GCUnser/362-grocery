@@ -73,6 +73,10 @@ public class Item implements Serializable {
         }
     }
 
+    public void increasePrice(int amount) {
+        this.price += amount;
+    }
+
     public String getName() {
         return name;
     }
