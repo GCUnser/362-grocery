@@ -8,7 +8,6 @@ import java.util.Scanner;
 public class Main {
     public static String city;
     private static final String INVENTORY_FILE_PATH = "./"; // Base path for inventory files
-
     public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
@@ -46,9 +45,9 @@ public class Main {
             System.out.println("Choose an option:");
             System.out.println("1. Add a new store location");
             System.out.println("2. Add an item to Chain Inventory");
+            System.out.println("3. View Contract Information");
             for (int i = 0; i < locations.size(); i++) {
-                System.out.println((i + 3) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new
-                                                                       // store"
+                System.out.println((i + 4) + ". " + locations.get(i)); // Offset by 2 since option 1 is "Add a new store"
             }
             System.out.print("Enter the number of your choice: ");
             String input = scanner.nextLine();
@@ -61,7 +60,7 @@ public class Main {
                     String newLocation = scanner.nextLine();
                     try {
                         boolean newStore = chain.addNewLocation(newLocation);
-                        if (newStore) {
+                        if(newStore) {
                             locations.add(newLocation); // Update the locations list
                             System.out.println("New store added successfully.");
                         }
@@ -88,7 +87,8 @@ public class Main {
                             System.out.println("Item exists in Inventory");
                             System.out.print("Enter item quantity to add: ");
                             quantity = scanner.nextInt();
-                            if (i.getPrice() * quantity > chain.getMoney()) {
+                            if(i.getPrice() * quantity > chain.getMoney())
+                            {
                                 System.out.println("Not enough money to purchase requested quantity");
                                 correctName = false;
                                 break;
@@ -139,13 +139,107 @@ public class Main {
                         chain.addItem(item);
                         System.out.println("Item added successfully!\n");
                     }
-                } else if (choice >= 3 && choice <= locations.size() + 2) {
-                    city = locations.get(choice - 3); // Offset by 2 since option 1 is "Add a new store"
+                }
+                else if(choice == 3){
+                    boolean contractOptions = true;
+                    while(contractOptions){
+                        int contractChoice;
+                        System.out.println("Choose an option:");
+                        System.out.println("1. Add/Renew Contract");
+                        System.out.println("2. Add an item to specified Contract");
+                        System.out.println("3. Terminate/Remove Contract");
+                        System.out.println("4. Return to Store Selection");
+                        System.out.print("Enter the number of your choice: ");
+                        input = scanner.nextLine();
+
+                        try{
+                            contractChoice = Integer.parseInt(input);
+                            int contractNumber = 1;
+                            switch(contractChoice){
+                                case 1:
+                                    System.out.println("Input a new name to add a new contract, otherwise select the contract to renew.");
+
+                                    for(Contract c : chain.getContracts()){
+                                        System.out.println(contractNumber + ". " + c.getContractName() + ": Price to renew: " + c.getRenewPrice());
+                                        contractNumber++;
+                                    }
+                                    input = scanner.nextLine();
+
+                                    for(Contract c : chain.getContracts()){
+                                        if(input.equalsIgnoreCase(c.getContractName())){
+                                            System.out.println("Trying to renew contract " + c.getContractName());
+                                            if(chain.getMoney() >= c.getRenewPrice()){
+                                                chain.removeMoney(c.getRenewPrice());
+                                                System.out.println("Contract renewed, please input new expiration date (Format YYYY-mm-dd)");
+                                                input = scanner.nextLine();
+                                                c.updateDate(input);
+                                            }
+                                            else{
+                                                System.out.println("Not enough money to renew contract");
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+
+                                case 2:
+                                    System.out.println("Input contract name to add an item to");
+                                    for(Contract c : chain.getContracts()){
+                                        System.out.println(contractNumber + ". " + c.getContractName() + ": Price to add new item: " + c.getAddItemPrice());
+                                        contractNumber++;
+                                    }
+                                    input = scanner.nextLine();
+                                    for(Contract c : chain.getContracts()){
+                                        if(input.equalsIgnoreCase(c.getContractName())){
+                                            System.out.println("Trying to add item to contract " + c.getContractName());
+                                            if(chain.getMoney() >= c.getAddItemPrice()){
+                                                chain.removeMoney(c.getAddItemPrice());
+                                                System.out.println("Pay completed: please enter item name to add");
+                                                input = scanner.nextLine();
+                                                boolean haveItem = false;
+                                                for(Item i : c.getInventory()){
+                                                    if(i.getName().equalsIgnoreCase(input)){
+                                                        System.out.println("Item already exists in contract");
+                                                        haveItem = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if(!haveItem){
+                                                    System.out.println("Please enter item category");
+                                                    String itemCategory = scanner.nextLine();
+                                                    System.out.println("Please enter item price");
+                                                    double itemPrice = Double.parseDouble(scanner.nextLine());
+                                                    c.addItemToContract(new Item(input, itemCategory, itemPrice));
+                                                }
+                                            }
+                                            else{
+                                                System.out.println("Not enough money to add new item to contract");
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+
+
+                                case 4:
+                                    contractOptions = false;
+                                    break;
+
+                                default:
+                                    System.out.println("Please input a valid choice");
+                            }
+
+                        } catch(NumberFormatException e){
+                            System.out.println("Invalid input. Please enter a number.");
+                        }
+                    }
+                }
+                else if (choice >= 4 && choice <= locations.size() + 4) {
+                    city = locations.get(choice - 4); // Offset by 2 since option 1 is "Add a new store"
                     System.out.println("You selected: " + city);
                     valid = true;
                 } else {
-                    System.out.println(
-                            "Invalid choice. Please select a number between 1 and " + (locations.size() + 1) + ".");
+                    System.out.println("Invalid choice. Please select a number between 1 and " + (locations.size() + 1) + ".");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -227,7 +321,7 @@ public class Main {
                             name = scanner.nextLine();
                         }
                     }
-                    for (Item i : chain.getInventory()) {
+                    for (Item i : chain.getInventory()){
                         if (i.getName().compareTo(name.toLowerCase()) == 0) {
                             System.out.println("Item exists in Chain Inventory");
                             System.out.print("Enter item quantity to add: ");
@@ -246,27 +340,52 @@ public class Main {
                                             quantity--;
                                         }
                                         i.getDateList().clear();
-                                        if (i.getPrice() * quantity < chain.getMoney()) {
-                                            System.out
-                                                    .print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
+                                        if(i.getPrice() * quantity < chain.getMoney()){
+                                            System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
                                             String date = scanner.next();
                                             store.addItemQuantity(date, quantity, i);
                                             chain.removeMoney(i.getPrice() * quantity);
-                                        } else {
-                                            System.out.println(
-                                                    "Not enough money in chain to add all requested quantity.");
                                         }
-                                    } else {
-                                        while (quantity > 0) {
+                                        else{
+                                            System.out.println("Not enough money in chain to add all requested quantity.");
+                                        }
+                                    }
+                                    else{
+                                        while(quantity > 0){
                                             String date = i.getDateList().removeFirst();
                                             ib.addQuantity(date, 1);
                                             quantity--;
                                         }
                                     }
+                                    correctName = false;
                                     break;
                                 }
                             }
-                            correctName = false;
+                            if(correctName){
+                                store.addItem(i);
+                                Item ib = store.getInventory().getLast();
+                                for(int k = ib.getQuantity() - 1; k > quantity; k--){
+                                    ib.getDateList().removeLast();
+                                }
+                                int j = 0;
+                                for(int k = 0; k < quantity; k++){
+                                    i.removeDate(0);
+                                    j++;
+                                }
+                                if(quantity > j){
+                                    quantity = quantity - j;
+                                    if(ib.getPrice() * quantity < chain.getMoney()){
+                                        System.out.print("Enter expiration date of the item in form 'YYYY-mm-dd': ");
+                                        String date = scanner.next();
+                                        store.addItemQuantity(date, quantity, ib);
+                                        chain.removeMoney(ib.getPrice() * quantity);
+                                    }
+                                    else{
+                                        System.out.println("Not enough money in chain to add all requested quantity.");
+                                    }
+                                }
+                                correctName = false;
+                            }
                             break;
                         }
                     }
@@ -289,7 +408,8 @@ public class Main {
                                 String date = scanner.next();
                                 store.addItemQuantity(date, quantity, i);
                                 chain.removeMoney(i.getPrice() * quantity);
-                            } else {
+                            }
+                            else{
                                 System.out.println("Not enough money in chain to add all requested quantity.");
                             }
                             correctName = false;
@@ -492,8 +612,7 @@ public class Main {
                     }
 
                     // Checkout process
-                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member, filename, usePoints,
-                            premium);
+                    totalCost = store.checkout(payChoice, userMoney, twentyonePlus, member, filename, usePoints, premium);
                     break;
 
                 case 7:
@@ -721,6 +840,7 @@ public class Main {
                     }
                     break;
 
+
                 case 15:
                     System.out.print("Enter the item to put on sale: ");
                     name = scanner.nextLine();
@@ -732,13 +852,13 @@ public class Main {
                     System.out.print("Is there a limit on how many items the customer can buy on sale? (y/n): ");
                     String limitExists = scanner.nextLine();
                     String limit = "N/A";
-                    if (limitExists.equalsIgnoreCase("y")) {
+                    if(limitExists.equalsIgnoreCase("y")) {
                         System.out.print("Enter the limit: ");
                         limit = scanner.next();
                         scanner.nextLine();
                     }
-                    if (yOrN.equalsIgnoreCase("y")) {
-                        saleItems.addSale(city, name, discount, true, limit);
+                    if(yOrN.equalsIgnoreCase("y")) {
+                        saleItems.addSale(city,name,discount, true, limit);
                     } else {
                         saleItems.addSale(city, name, discount, false, limit);
                     }
@@ -747,19 +867,19 @@ public class Main {
                 case 16:
                     System.out.print("Enter the item to take off sale: ");
                     name = scanner.nextLine();
-                    saleItems.removeSale(city, name);
+                    saleItems.removeSale(city,name);
                     break;
                 case 17:
                     saleItems.listSales(city);
                     break;
 
                 case 18:
-                    // Transfer employees to a new store
+                    //Transfer employees to a new store
 
                     HashMap<Integer, String> transferEmployees = new HashMap<>();
                     HashMap<Integer, String> storeBranch = new HashMap<>();
 
-                    // Load employee data from file
+// Load employee data from file
                     try (BufferedReader br = new BufferedReader(new FileReader("transferEmployees.txt"))) {
                         String line;
                         while ((line = br.readLine()) != null) {
@@ -799,8 +919,7 @@ public class Main {
                             // Ask if the employee wants to transfer
                             String response = null;
                             while (true) {
-                                System.out.println(
-                                        "Would " + employeeName + " like to transfer to a new store? (yes/no)");
+                                System.out.println("Would " + employeeName + " like to transfer to a new store? (yes/no)");
 
                                 // Use the existing scanner object for input
                                 if (scanner.hasNextLine()) {
@@ -826,8 +945,7 @@ public class Main {
                                 // Prompt for branch ID
                                 int chosenBranchId = -1;
                                 while (true) {
-                                    System.out.println("Enter the ID of the store branch " + employeeName
-                                            + " wants to transfer to:");
+                                    System.out.println("Enter the ID of the store branch " + employeeName + " wants to transfer to:");
 
                                     // Validate user input for store branch ID
                                     if (scanner.hasNextLine()) {
@@ -849,12 +967,10 @@ public class Main {
                                 }
 
                                 String chosenBranch = storeBranch.get(chosenBranchId);
-                                writer.write(
-                                        employeeName + " will transfer to " + chosenBranch + System.lineSeparator());
+                                writer.write(employeeName + " will transfer to " + chosenBranch + System.lineSeparator());
                                 System.out.println(employeeName + " will transfer to " + chosenBranch + ".");
                             } else {
-                                writer.write(
-                                        employeeName + " will not transfer to a new store." + System.lineSeparator());
+                                writer.write(employeeName + " will not transfer to a new store." + System.lineSeparator());
                             }
                         }
 
@@ -864,7 +980,9 @@ public class Main {
                         e.printStackTrace();
                     }
 
+
                     break;
+
 
                 case 19:
 
@@ -873,7 +991,7 @@ public class Main {
 
                     // Read the employeesWorking.txt file
                     try (BufferedReader br = new BufferedReader(new FileReader("employeesWorking.txt"));
-                            FileWriter writer = new FileWriter("employeesWorkingResult.txt")) {
+                         FileWriter writer = new FileWriter("employeesWorkingResult.txt")) {
 
                         String line;
                         while ((line = br.readLine()) != null) {
@@ -888,10 +1006,7 @@ public class Main {
                                 employeesWorking.put(id, empName);
 
                                 // Write the employee's status to the file
-                                writer.write(empName + " is "
-                                        + (workingStatus.equalsIgnoreCase("Yes") ? "currently on the clock."
-                                                : "not on the clock.")
-                                        + "\n");
+                                writer.write(empName + " is " + (workingStatus.equalsIgnoreCase("Yes") ? "currently on the clock." : "not on the clock.") + "\n");
 
                                 // Increase empCount if workingStatus is "Yes"
                                 if (workingStatus.equalsIgnoreCase("Yes")) {
@@ -909,11 +1024,13 @@ public class Main {
                     }
 
                     break;
+                    
 
                 case 20:
                     List<Item> itemList;
                     itemList = store.removeFiles();
-                    for (Item toAdd : itemList) {
+                    for(Item toAdd: itemList)
+                    {
                         chain.addItemToStock(toAdd);
                         chain.removeLocation(city);
                     }
@@ -939,9 +1056,11 @@ public class Main {
                 case 23:
                     LoyaltyProgram.upgradeMembership();
                     break;
+
                 case 24:
                     LoyaltyProgram.deleteMembership();
                     break;
+
 
                 case 25:
                     // Coupons
